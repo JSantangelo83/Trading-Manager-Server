@@ -6,9 +6,9 @@ import TimedCandles from "../interfaces/TimedCandles";
 import Indicator from "./Indicator";
 import Signal from "./Signal";
 
-class Strategy {
+export default class Strategy {
     signals: Signal[]
-    pairs: string[]
+    pairs: string[] | undefined
     url: string | undefined
     timedCandles: TimedCandles[] | undefined
     indicators: Indicator[]
@@ -45,19 +45,18 @@ class Strategy {
         if (this.url) {
             //TODO handle urls
         } else if (this.timedCandles && this.startTime) {
-            if(Object.keys(this.historicalCandles).length > 1){
+            if (Object.keys(this.timedCandles).length > 1) {
                 //Handle Multi-TimeFrames
-            }else{
-                this.historicalCandles = this.timedCandles.map(tc => { tc.candles = tc.candles.filter(c => c.openTime! < this.startTime); return tc })
-                let futureCandles: TimedCandles[] = this.timedCandles.map(tc => { tc.candles = tc.candles.filter(c => c.openTime! >= this.startTime); return tc })
-                this.indicators.forEach(indicator => indicator.calculateHistory(this.historicalCandles.filter(tc => tc.timeFrame == indicator.timeFrame)[0].candles))
-                futureCandles.forEach(candle => {
+            } else {
+                this.historicalCandles = [{ timeFrame: this.timedCandles[0].timeFrame, candles: this.timedCandles[0].candles.filter(c => c.closeTime! < this.startTime) }];
+                let futureCandles = [{ timeFrame: this.timedCandles[0].timeFrame, candles: this.timedCandles[0].candles.filter(c => c.closeTime! < this.startTime) }];
+                this.indicators.forEach(indicator => indicator.calculateHistory(this.historicalCandles[0].candles));
+                futureCandles[0].candles.forEach(candle => {
                     this.actualCandle = candle;
                     this.updateIndicators();
                     this.checkSignals();
-                    this.historicalCandles.push(candle);
+                    this.historicalCandles[0].candles.push(candle);
                 })
-
             }
 
         } else {

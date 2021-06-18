@@ -13,7 +13,7 @@ export default interface StrategyConfig {
     /*
     * List of pairs to watch
     */
-    pairs: string[],
+    pairs?: string[],
     /**
      * Global time frame for the Strategy
      */

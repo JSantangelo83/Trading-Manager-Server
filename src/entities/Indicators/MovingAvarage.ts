@@ -4,7 +4,7 @@ import IndicatorConfig from "../../interfaces/IndicatorConfig";
 import MovingAvaragesConfig from "../../interfaces/Indicators/MovingAvaragesConfig";
 import Indicator from "../Indicator";
 
-class MovingAvarages extends Indicator {
+export default class MovingAvarage extends Indicator {
 
     constructor(movingAvarageConfig: MovingAvaragesConfig) {
         let period = movingAvarageConfig.period;
