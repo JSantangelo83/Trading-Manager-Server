@@ -33,7 +33,10 @@ export default class Strategy {
         /** Loading indicators from Signals */
         this.signals.forEach(signal => {
             signal.indicators.forEach(indicator => {
-                this.indicators.push(indicator)
+                //Looking for duplicated Indicators
+                if (!this.indicators.map(indicator => indicator.id).includes(indicator.id)) {
+                    this.indicators.push(indicator)
+                };
             })
         })
 
@@ -48,8 +51,8 @@ export default class Strategy {
             if (Object.keys(this.timedCandles).length > 1) {
                 //Handle Multi-TimeFrames
             } else {
-                this.historicalCandles = [{ timeFrame: this.timedCandles[0].timeFrame, candles: this.timedCandles[0].candles.filter(c => c.closeTime! < this.startTime) }];
-                let futureCandles = [{ timeFrame: this.timedCandles[0].timeFrame, candles: this.timedCandles[0].candles.filter(c => c.closeTime! < this.startTime) }];
+                this.historicalCandles = [{ timeFrame: this.timedCandles[0].timeFrame, candles: this.timedCandles[0].candles.filter(c => c.closeTime! <= this.startTime) }];
+                let futureCandles = [{ timeFrame: this.timedCandles[0].timeFrame, candles: this.timedCandles[0].candles.filter(c => c.closeTime! > this.startTime) }];
                 this.indicators.forEach(indicator => indicator.calculateHistory(this.historicalCandles[0].candles));
                 futureCandles[0].candles.forEach(candle => {
                     this.actualCandle = candle;
@@ -66,13 +69,18 @@ export default class Strategy {
 
     /** Updates all the indicator's values */
     updateIndicators() {
-        this.indicators.forEach(indicator => indicator.calculateNext(this.actualCandle, this.historicalCandles.filter(tc => tc.timeFrame == indicator.timeFrame)[0].candles))
+        this.indicators.forEach(indicator => {
+            console.log(this.historicalCandles[0].timeFrame)
+            console.log(indicator.timeFrame);
+            indicator.calculateNext(this.actualCandle, this.historicalCandles.filter(tc => tc.timeFrame == indicator.timeFrame)[0].candles)
+        })
     }
 
     /** Checks the state of the signals and triggers operations */
     checkSignals() {
-        let shortSignalStates = this.signals.map(signal => signal.direction == TradingDirections.Short ? signal.getState() : undefined).filter(el => el != undefined)
-        let longSignalStates = this.signals.map(signal => signal.direction == TradingDirections.Long ? signal.getState() : undefined).filter(el => el != undefined)
+        // console.log(this.signals)
+        let shortSignalStates = this.signals.map(signal => signal.direction === TradingDirections.Short ? signal.getState() : undefined).filter(el => el != undefined)
+        let longSignalStates = this.signals.map(signal => signal.direction === TradingDirections.Long ? signal.getState() : undefined).filter(el => el != undefined)
         if (!shortSignalStates.includes(false)) { this.makeShort() }
         if (!longSignalStates.includes(false)) { this.makeLong() }
     }

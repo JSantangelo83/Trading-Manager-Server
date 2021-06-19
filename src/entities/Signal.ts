@@ -19,11 +19,11 @@ export default class Signal {
         this.indicators = config.indicators
         this.direction = config.direction
         this.margin = config.margin ? config.margin : 1
-        this.duration = config.duration ? config.duration : 0;
+        this.duration = config.duration ? config.duration : 10;
         if (this.duration < this.margin) throw new Error('Duration of signal cannot be smaller than margin')
     }
 
-    getState() {
+    calculateState() {
         if (this.type == SignalTypes.over || this.type == SignalTypes.under) {
             if (this.indicators.length < 2) throw new Error('Must provide 2 indicators to "over" and "under" Signal type')
             let marginArr0 = this.indicators[0].getLastValues(this.margin);
@@ -39,8 +39,13 @@ export default class Signal {
                 let durationFilter = this.type == SignalTypes.over ? (v: number, i: number) => v > durationArr1[i] : (v: number, i: number) => v < durationArr1[i]
                 byDuration = !durationArr0.every(durationFilter);
             }
-            return byMargin && byDuration;
+            this.state = (byMargin && byDuration);
         }
-        return false
+        this.state = false
+    }
+
+    getState() {
+        this.calculateState();
+        return this.state
     }
 }

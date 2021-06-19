@@ -15,8 +15,8 @@ export default class MovingAvarage extends Indicator {
             case MovingAvaragesTypes.Simple:
                 indConfig.formule = (candle: Candle, historicalCandles: Candle[]) => {
                     //TODO Test if any 'candle' hasn't 'target' property. 
-                    if (historicalCandles.length > period) {
-                        return historicalCandles.slice(historicalCandles.length - period + 1).map(candle => candle[target]).reduce((vs, v) => vs! + v!)! + candle[target]! / period
+                    if (historicalCandles.length >= period) {
+                        return (historicalCandles.slice(historicalCandles.length - period + 1).map(candle => candle[target]).reduce((vs, v) => vs! + v!)! + candle[target]!) / period
                     }
                     return -1
                 }; break;
@@ -24,14 +24,16 @@ export default class MovingAvarage extends Indicator {
                 indConfig.formule = (candle: Candle, historicalCandles: Candle[]) => {
                     //TODO Test if any 'candle' hasn't 'target' property. 
                     if (historicalCandles.length > period) {
-                        return (candle[target]! * (2 / (period + 1)) + (this.valueArray.length ? this.valueArray[this.valueArray.length - 1] : historicalCandles[historicalCandles.length - 1][target]!) * (1 - (2 / (period + 1))));
+                        return candle[target]! * (2 / (period + 1)) + (this.valueArray.length ? this.valueArray[this.valueArray.length - 1] : historicalCandles[historicalCandles.length - 1][target]!) * (1 - (2 / (period + 1)))
                     }
                     return -1
                 }; break;
             case MovingAvaragesTypes.Smoothed: break;
             case MovingAvaragesTypes.LinearWeighted: break;
         }
-
+        indConfig.id = movingAvarageConfig.id;
+        indConfig.tag = movingAvarageConfig.tag;
+        indConfig.timeFrame = movingAvarageConfig.timeFrame;
         super(indConfig)
     }
 }

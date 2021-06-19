@@ -1,0 +1,21 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var TimeFrame;
+(function (TimeFrame) {
+    TimeFrame[TimeFrame["1m"] = 0] = "1m";
+    TimeFrame[TimeFrame["3m"] = 1] = "3m";
+    TimeFrame[TimeFrame["5m"] = 2] = "5m";
+    TimeFrame[TimeFrame["15m"] = 3] = "15m";
+    TimeFrame[TimeFrame["30m"] = 4] = "30m";
+    TimeFrame[TimeFrame["1h"] = 5] = "1h";
+    TimeFrame[TimeFrame["2h"] = 6] = "2h";
+    TimeFrame[TimeFrame["4h"] = 7] = "4h";
+    TimeFrame[TimeFrame["6h"] = 8] = "6h";
+    TimeFrame[TimeFrame["8h"] = 9] = "8h";
+    TimeFrame[TimeFrame["12h"] = 10] = "12h";
+    TimeFrame[TimeFrame["1d"] = 11] = "1d";
+    TimeFrame[TimeFrame["3d"] = 12] = "3d";
+    TimeFrame[TimeFrame["1w"] = 13] = "1w";
+    TimeFrame[TimeFrame["1M"] = 14] = "1M";
+})(TimeFrame || (TimeFrame = {}));
+exports.default = TimeFrame;

@@ -1,4 +1,5 @@
 export default interface Entity {
-    name: string,
-    tag: string,
+    id: number,
+    name?: string,
+    tag?: string,
 }
