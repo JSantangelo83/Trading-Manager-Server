@@ -9,21 +9,21 @@ import Indicator from "./Indicator";
 export default class Signal {
     type: SignalTypes
     indicators: Indicator[];
-    state: boolean = false;
     duration: number;
     margin: number;
     direction: TradingDirections
+    state: boolean = false;
 
     constructor(config: SignalConfig) {
         this.type = config.type;
         this.indicators = config.indicators
         this.direction = config.direction
         this.margin = config.margin ? config.margin : 1
-        this.duration = config.duration ? config.duration : 10;
-        if (this.duration < this.margin) throw new Error('Duration of signal cannot be smaller than margin')
+        this.duration = config.duration ? config.duration : 0;
+        if (this.duration < this.margin && this.duration != 0) throw new Error('Duration of signal cannot be smaller than margin')
     }
 
-    calculateState() {
+    calculateNewState() {
         if (this.type == SignalTypes.over || this.type == SignalTypes.under) {
             if (this.indicators.length < 2) throw new Error('Must provide 2 indicators to "over" and "under" Signal type')
             let marginArr0 = this.indicators[0].getLastValues(this.margin);
@@ -31,7 +31,6 @@ export default class Signal {
 
             let marginFilter = this.type == SignalTypes.over ? (v: number, i: number) => v > marginArr1[i] : (v: number, i: number) => v < marginArr1[i]
             let byMargin = marginArr0.every(marginFilter);
-
             let byDuration = true;
             if (this.duration) {
                 let durationArr0 = this.indicators[0].getLastValues(this.margin + this.duration + 1)
@@ -39,13 +38,16 @@ export default class Signal {
                 let durationFilter = this.type == SignalTypes.over ? (v: number, i: number) => v > durationArr1[i] : (v: number, i: number) => v < durationArr1[i]
                 byDuration = !durationArr0.every(durationFilter);
             }
-            this.state = (byMargin && byDuration);
+            return (byMargin && byDuration);
         }
-        this.state = false
+        return false
     }
 
     getState() {
-        this.calculateState();
-        return this.state
+        let oldState = this.state
+        this.state = this.calculateNewState();
+        if (oldState != this.state) { return this.state }
+        return false;
     }
+
 }

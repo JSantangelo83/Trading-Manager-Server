@@ -60,6 +60,17 @@ export default class Strategy {
                     this.checkSignals();
                     this.historicalCandles[0].candles.push(candle);
                 })
+                //SAVE INDICATOR VALUES
+                this.indicators.forEach(indicator => {
+                    let fs = require('fs');
+                    fs.writeFileSync('TMP }' + (indicator.tag || 'indicator' + indicator.id), JSON.stringify(indicator.valueArray).replace('[', '').replace(']', ''));
+                })
+
+                //SAVE SIGNAL VALUES
+                // this.signals.forEach((signal, i) => {
+                //     let fs = require('fs')
+                //     fs.writeFileSync('TMP signal ' + i, JSON.stringify(signal.test))
+                // })
             }
 
         } else {
@@ -70,15 +81,12 @@ export default class Strategy {
     /** Updates all the indicator's values */
     updateIndicators() {
         this.indicators.forEach(indicator => {
-            console.log(this.historicalCandles[0].timeFrame)
-            console.log(indicator.timeFrame);
             indicator.calculateNext(this.actualCandle, this.historicalCandles.filter(tc => tc.timeFrame == indicator.timeFrame)[0].candles)
         })
     }
 
     /** Checks the state of the signals and triggers operations */
     checkSignals() {
-        // console.log(this.signals)
         let shortSignalStates = this.signals.map(signal => signal.direction === TradingDirections.Short ? signal.getState() : undefined).filter(el => el != undefined)
         let longSignalStates = this.signals.map(signal => signal.direction === TradingDirections.Long ? signal.getState() : undefined).filter(el => el != undefined)
         if (!shortSignalStates.includes(false)) { this.makeShort() }

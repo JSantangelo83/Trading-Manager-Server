@@ -38,6 +38,14 @@ app.get('/test', function (req, res) {
         target: 'close',
         timeFrame: TimeFrames_1.default['1h'],
     });
+    var exponentialEma = new MovingAvarage_1.default({
+        id: 1,
+        tag: 'exponential',
+        period: 20,
+        type: MovingAvaragesTypes_1.default.Exponential,
+        target: 'close',
+        timeFrame: TimeFrames_1.default['1h'],
+    });
     var longSignal = new Signal_1.default({
         direction: TradingDirections_1.TradingDirections.Long,
         indicators: [fastEma, slowEma],

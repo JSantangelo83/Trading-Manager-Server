@@ -40,6 +40,15 @@ app.get('/test', (req, res) => {
         timeFrame:TimeFrame['1h'],
     })
 
+    let exponentialEma = new MovingAvarage({
+        id: 1,
+        tag: 'exponential',
+        period: 20,
+        type: MovingAvaragesTypes.Exponential,
+        target: 'close',
+        timeFrame:TimeFrame['1h'],
+    })
+
     let longSignal = new Signal({
         direction: TradingDirections.Long,
         indicators: [fastEma, slowEma],

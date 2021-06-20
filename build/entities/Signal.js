@@ -11,11 +11,11 @@ var Signal = /** @class */ (function () {
         this.indicators = config.indicators;
         this.direction = config.direction;
         this.margin = config.margin ? config.margin : 1;
-        this.duration = config.duration ? config.duration : 10;
-        if (this.duration < this.margin)
+        this.duration = config.duration ? config.duration : 0;
+        if (this.duration < this.margin && this.duration != 0)
             throw new Error('Duration of signal cannot be smaller than margin');
     }
-    Signal.prototype.calculateState = function () {
+    Signal.prototype.calculateNewState = function () {
         if (this.type == SignalTypes_1.SignalTypes.over || this.type == SignalTypes_1.SignalTypes.under) {
             if (this.indicators.length < 2)
                 throw new Error('Must provide 2 indicators to "over" and "under" Signal type');
@@ -30,13 +30,17 @@ var Signal = /** @class */ (function () {
                 var durationFilter = this.type == SignalTypes_1.SignalTypes.over ? function (v, i) { return v > durationArr1_1[i]; } : function (v, i) { return v < durationArr1_1[i]; };
                 byDuration = !durationArr0.every(durationFilter);
             }
-            this.state = (byMargin && byDuration);
+            return (byMargin && byDuration);
         }
-        this.state = false;
+        return false;
     };
     Signal.prototype.getState = function () {
-        this.calculateState();
-        return this.state;
+        var oldState = this.state;
+        this.state = this.calculateNewState();
+        if (oldState != this.state) {
+            return this.state;
+        }
+        return false;
     };
     return Signal;
 }());

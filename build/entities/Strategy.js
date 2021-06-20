@@ -58,6 +58,16 @@ var Strategy = /** @class */ (function () {
                     _this.checkSignals();
                     _this.historicalCandles[0].candles.push(candle);
                 });
+                //SAVE INDICATOR VALUES
+                this.indicators.forEach(function (indicator) {
+                    var fs = require('fs');
+                    fs.writeFileSync('TMP }' + (indicator.tag || 'indicator' + indicator.id), JSON.stringify(indicator.valueArray).replace('[', '').replace(']', ''));
+                });
+                //SAVE SIGNAL VALUES
+                // this.signals.forEach((signal, i) => {
+                //     let fs = require('fs')
+                //     fs.writeFileSync('TMP signal ' + i, JSON.stringify(signal.test))
+                // })
             }
         }
         else {
@@ -73,7 +83,6 @@ var Strategy = /** @class */ (function () {
     };
     /** Checks the state of the signals and triggers operations */
     Strategy.prototype.checkSignals = function () {
-        // console.log(this.signals)
         var shortSignalStates = this.signals.map(function (signal) { return signal.direction === TradingDirections_1.TradingDirections.Short ? signal.getState() : undefined; }).filter(function (el) { return el != undefined; });
         var longSignalStates = this.signals.map(function (signal) { return signal.direction === TradingDirections_1.TradingDirections.Long ? signal.getState() : undefined; }).filter(function (el) { return el != undefined; });
         if (!shortSignalStates.includes(false)) {
