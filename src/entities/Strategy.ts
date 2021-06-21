@@ -55,7 +55,7 @@ class Strategy {
                 //SAVE INDICATOR VALUES
                 this.indicators.forEach(indicator => {
                     let fs = require('fs');
-                    fs.writeFileSync('TMP }' + (indicator.tag || 'indicator' + indicator.id), JSON.stringify(indicator.valueArray).replace('[', '').replace(']', ''));
+                    fs.writeFileSync(__dirname + '/../../Testing/TMP ' + (indicator.tag || 'indicator' + indicator.id), JSON.stringify(indicator.valueArray).replace('[', '').replace(']', ''));
                 })
 
                 //SAVE SIGNAL VALUES

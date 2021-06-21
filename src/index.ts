@@ -28,7 +28,7 @@ app.get('/test', (req, res) => {
         period: 200,
         type: MovingAvaragesTypes.Simple,
         source: 'close',
-        timeFrame:TimeFrame['1h'],
+        timeFrame: TimeFrame['1h'],
     })
 
 
@@ -38,7 +38,7 @@ app.get('/test', (req, res) => {
         period: 20,
         type: MovingAvaragesTypes.Simple,
         source: 'close',
-        timeFrame:TimeFrame['1h'],
+        timeFrame: TimeFrame['1h'],
     })
 
     let exponentialEma = new MovingAvarage({
@@ -47,7 +47,7 @@ app.get('/test', (req, res) => {
         period: 20,
         type: MovingAvaragesTypes.Exponential,
         source: 'close',
-        timeFrame:TimeFrame['1h'],
+        timeFrame: TimeFrame['1h'],
     })
 
     let longSignal = new Signal({
@@ -63,7 +63,7 @@ app.get('/test', (req, res) => {
     })
 
     let fs = require('fs');
-    let candles: Candle[] = JSON.parse(fs.readFileSync('./src/TestingData/BtcUsdt1hConverted.json'));
+    let candles: Candle[] = JSON.parse(fs.readFileSync(__dirname + '/../Testing/BtcUsdt1hConverted.json'));
     let doubleEmaStrategy = new Strategy({
         signals: [longSignal, shortSignal],
         timeFrame: TimeFrame['1h'],
