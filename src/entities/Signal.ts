@@ -7,13 +7,15 @@ import Indicator from "./Indicator";
 * Triggers callback on condition
 */
 export default class Signal {
+    //Config Properties
     type: SignalTypes
     indicators: Indicator[];
     duration: number;
     margin: number;
     direction: TradingDirections
-    state: boolean = false;
-
+    //Runtime Properties
+    state: boolean = false
+    
     constructor(config: SignalConfig) {
         this.type = config.type;
         this.indicators = config.indicators

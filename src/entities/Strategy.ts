@@ -4,32 +4,24 @@ import Candle from "../interfaces/Candle";
 import strategyConfig from "../interfaces/StrategyConfig";
 import TimedCandles from "../interfaces/TimedCandles";
 import Indicator from "./Indicator";
-import Signal from "./Signal";
+import Position from "./Position";
 
-export default class Strategy {
-    signals: Signal[]
-    pairs: string[] | undefined
-    url: string | undefined
-    timedCandles: TimedCandles[] | undefined
-    indicators: Indicator[]
-    startTime: number
-    timeFrame: TimeFrame
+interface Strategy extends strategyConfig { }
+class Strategy {
+    //Runtime Properties
 
-    actualCandle: Candle
-    historicalCandles: TimedCandles[];
+    /** Indicators contained of strategy (obtained from Signals)*/
+    indicators: Indicator[] = []
+    /** Last checked candle */
+    actualCandle: Candle = <Candle>{};
+    /** Candles until `actualCandle` */
+    historicalCandles: TimedCandles[] = <TimedCandles[]>[];
+    /** Current opened positions */
+    openPositions: Position[] = <Position[]>[];
+
     constructor(config: strategyConfig) {
-        this.signals = config.signals
-        this.pairs = config.pairs
-        this.url = config.url
-        this.timedCandles = config.timedCandles
-        this.startTime = config.startTime || 200
-        this.timeFrame = config.timeFrame
-        /** Indicators contained of strategy (obtained from Signals)*/
-        this.indicators = []
-        /** Last checked candle */
-        this.actualCandle = <Candle>{};
-        /** Candles until `actualCandle` */
-        this.historicalCandles = <TimedCandles[]>[];
+        Object.assign(this, config)
+
         /** Loading indicators from Signals */
         this.signals.forEach(signal => {
             signal.indicators.forEach(indicator => {
@@ -51,8 +43,8 @@ export default class Strategy {
             if (Object.keys(this.timedCandles).length > 1) {
                 //Handle Multi-TimeFrames
             } else {
-                this.historicalCandles = [{ timeFrame: this.timedCandles[0].timeFrame, candles: this.timedCandles[0].candles.filter(c => c.closeTime! <= this.startTime) }];
-                let futureCandles = [{ timeFrame: this.timedCandles[0].timeFrame, candles: this.timedCandles[0].candles.filter(c => c.closeTime! > this.startTime) }];
+                this.historicalCandles = [{ timeFrame: this.timedCandles[0].timeFrame, candles: this.timedCandles[0].candles.filter(c => c.closeTime! <= this.startTime!) }];
+                let futureCandles = [{ timeFrame: this.timedCandles[0].timeFrame, candles: this.timedCandles[0].candles.filter(c => c.closeTime! > this.startTime!) }];
                 this.indicators.forEach(indicator => indicator.calculateHistory(this.historicalCandles[0].candles));
                 futureCandles[0].candles.forEach(candle => {
                     this.actualCandle = candle;
@@ -85,22 +77,24 @@ export default class Strategy {
         })
     }
 
-    /** Checks the state of the signals and triggers operations */
+    /** Checks the state of the signals and triggers Positions */
     checkSignals() {
         let shortSignalStates = this.signals.map(signal => signal.direction === TradingDirections.Short ? signal.getState() : undefined).filter(el => el != undefined)
         let longSignalStates = this.signals.map(signal => signal.direction === TradingDirections.Long ? signal.getState() : undefined).filter(el => el != undefined)
         if (!shortSignalStates.includes(false)) { this.makeShort() }
         if (!longSignalStates.includes(false)) { this.makeLong() }
     }
-    /** Sends a short operation */
+    /** Sends a short Position */
     makeShort = () => {
         console.log('putting Short on candle: ', this.actualCandle)
         console.log('Time: ', this.actualCandle.closeTime)
     }
 
-    /** Sends a long operation */
+    /** Sends a long Position */
     makeLong = () => {
         console.log('putting Long on candle: ', this.actualCandle)
         console.log('Time: ', this.actualCandle.closeTime)
     }
+
 }
+export default Strategy

@@ -31,6 +31,7 @@ app.get('/test', (req, res) => {
         timeFrame:TimeFrame['1h'],
     })
 
+
     let fastEma = new MovingAvarage({
         id: 1,
         tag: 'fast',
