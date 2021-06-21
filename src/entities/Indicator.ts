@@ -12,6 +12,9 @@ abstract class Indicator {
     valueArray: number[] = <number[]>[];
     constructor(config: IndicatorConfig) {
         Object.assign(this, config);
+
+        //Error Handling
+        if (!this.formule) { throw new Error('The indicator MUST contain a formule') }
     }
     /**
      * Calculates all the indicator historical values and saves it to `lastValue` and `valueArray`.
@@ -28,7 +31,7 @@ abstract class Indicator {
      */
     calculateNext(newCandle: Candle, historicalCandles: Candle[]) {
         try {
-            this.lastValue = this.formule(newCandle, historicalCandles);
+            this.lastValue = this.formule!(newCandle, historicalCandles);
         } catch (err) {
             this.valueArray.push(-2);
         }

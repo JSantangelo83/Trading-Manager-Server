@@ -9,7 +9,7 @@ export default interface IndicatorConfig extends Entity {
      * 
      * @returns value, or -1 if cannot be calculated.
      */
-    formule: (candle: Candle, historicalCandles: Candle[]) => number
+    formule?: (candle: Candle, historicalCandles: Candle[]) => number
     /** Time Frame of the indicator */
     timeFrame: TimeFrame
 }

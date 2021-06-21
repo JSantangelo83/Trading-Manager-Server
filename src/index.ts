@@ -27,7 +27,7 @@ app.get('/test', (req, res) => {
         tag: 'slow',
         period: 200,
         type: MovingAvaragesTypes.Simple,
-        target: 'close',
+        source: 'close',
         timeFrame:TimeFrame['1h'],
     })
 
@@ -37,7 +37,7 @@ app.get('/test', (req, res) => {
         tag: 'fast',
         period: 20,
         type: MovingAvaragesTypes.Simple,
-        target: 'close',
+        source: 'close',
         timeFrame:TimeFrame['1h'],
     })
 
@@ -46,7 +46,7 @@ app.get('/test', (req, res) => {
         tag: 'exponential',
         period: 20,
         type: MovingAvaragesTypes.Exponential,
-        target: 'close',
+        source: 'close',
         timeFrame:TimeFrame['1h'],
     })
 

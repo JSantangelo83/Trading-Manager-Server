@@ -12,17 +12,17 @@ export default class MovingAvarage extends Indicator {
         switch (_this.type) {
             case MovingAvaragesTypes.Simple:
                 _this.formule = (candle: Candle, historicalCandles: Candle[]) => {
-                    //TODO Test if any 'candle' hasn't 'target' property. 
+                    //TODO Test if any 'candle' hasn't 'source' property. 
                     if (historicalCandles.length >= _this.period) {
-                        return (historicalCandles.slice(historicalCandles.length - _this.period + 1).map(candle => candle[_this.target]).reduce((vs, v) => vs! + v!)! + candle[_this.target]!) / _this.period
+                        return (historicalCandles.slice(historicalCandles.length - _this.period + 1).map(candle => candle[_this.source]).reduce((vs, v) => vs! + v!)! + candle[_this.source]!) / _this.period
                     }
                     return -1
                 }; break;
             case MovingAvaragesTypes.Exponential:
                 _this.formule = (candle: Candle, historicalCandles: Candle[]) => {
-                    //TODO Test if any 'candle' hasn't 'target' property. 
+                    //TODO Test if any 'candle' hasn't 'source' property. 
                     if (historicalCandles.length > _this.period) {
-                        return candle[_this.target]! * (2 / (_this.period + 1)) + (this.valueArray.length ? this.valueArray[this.valueArray.length - 1] : historicalCandles[historicalCandles.length - 1][_this.target]!) * (1 - (2 / (_this.period + 1)))
+                        return candle[_this.source]! * (2 / (_this.period + 1)) + (this.valueArray.length ? this.valueArray[this.valueArray.length - 1] : historicalCandles[historicalCandles.length - 1][_this.source]!) * (1 - (2 / (_this.period + 1)))
                     }
                     return -1
                 }; break;

@@ -41,7 +41,7 @@ class Strategy {
             //TODO handle urls
         } else if (this.timedCandles && this.startTime) {
             if (Object.keys(this.timedCandles).length > 1) {
-                //Handle Multi-TimeFrames
+                //TODO Handle Multi-TimeFrames
             } else {
                 this.historicalCandles = [{ timeFrame: this.timedCandles[0].timeFrame, candles: this.timedCandles[0].candles.filter(c => c.closeTime! <= this.startTime!) }];
                 let futureCandles = [{ timeFrame: this.timedCandles[0].timeFrame, candles: this.timedCandles[0].candles.filter(c => c.closeTime! > this.startTime!) }];

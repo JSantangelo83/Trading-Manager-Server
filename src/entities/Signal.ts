@@ -1,7 +1,5 @@
 import { SignalTypes } from "../enums/SignalTypes";
-import { TradingDirections } from "../enums/TradingDirections";
 import SignalConfig from "../interfaces/SignalConfig";
-import Indicator from "./Indicator";
 
 
 interface Signal extends SignalConfig { }
@@ -10,6 +8,7 @@ interface Signal extends SignalConfig { }
 */
 class Signal {
     //Runtime Properties
+    /** The state of the signal */
     state: boolean = false
 
     constructor(config: SignalConfig) {

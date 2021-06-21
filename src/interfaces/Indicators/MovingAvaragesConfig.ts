@@ -5,6 +5,6 @@ import IndicatorConfig from "../IndicatorConfig";
 export default interface MovingAvaragesConfig extends IndicatorConfig {
     period: number,
     type: MovingAvaragesTypes,
-    target: "close" | "high" | "low"; //Needs to improve
+    source: "close" | "high" | "low"; //Needs to improve
     timeFrame: TimeFrame,
 }
