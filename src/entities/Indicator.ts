@@ -2,24 +2,16 @@ import TimeFrame from "../enums/TimeFrames";
 import Candle from "../interfaces/Candle";
 import IndicatorConfig from "../interfaces/IndicatorConfig";
 
+interface Indicator extends IndicatorConfig { };
 /**
  * Primitive class of any Indicator
  */
-export default abstract class Indicator {
-    id: number;
-    lastValue: number;
-    valueArray: number[];
-    formule: (candle: Candle, historicalCandle: Candle[]) => number;
-    timeFrame: TimeFrame
-    tag: string | undefined
-    constructor(indicatorConfig: IndicatorConfig) {
-        this.lastValue = 0;
-        this.valueArray = [];
-        this.formule = indicatorConfig.formule;
-        this.timeFrame = indicatorConfig.timeFrame;
-        this.id = indicatorConfig.id;
-        this.tag = indicatorConfig.tag
-
+abstract class Indicator {
+    //Runtime Properties
+    lastValue: number = 0;
+    valueArray: number[] = <number[]>[];
+    constructor(config: IndicatorConfig) {
+        Object.assign(this, config);
     }
     /**
      * Calculates all the indicator historical values and saves it to `lastValue` and `valueArray`.
@@ -50,3 +42,5 @@ export default abstract class Indicator {
      */
     getLastValues(from: number): number[] { return from > 1 ? this.valueArray.slice(Math.max(this.valueArray.length - from, 0)) : [this.lastValue] }
 }
+
+export default Indicator;
