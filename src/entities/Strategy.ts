@@ -81,19 +81,25 @@ class Strategy {
     checkSignals() {
         let shortSignalStates = this.signals.map(signal => signal.direction === TradingDirections.Short ? signal.getState() : undefined).filter(el => el != undefined)
         let longSignalStates = this.signals.map(signal => signal.direction === TradingDirections.Long ? signal.getState() : undefined).filter(el => el != undefined)
-        if (!shortSignalStates.includes(false)) { this.makeShort() }
-        if (!longSignalStates.includes(false)) { this.makeLong() }
-    }
-    /** Sends a short Position */
-    makeShort = () => {
-        console.log('putting Short on candle: ', this.actualCandle)
-        console.log('Time: ', this.actualCandle.closeTime)
-    }
+        if ((!this.openPositions.length || this.openPositions[this.openPositions.length - 1].direction != TradingDirections.Short) && !shortSignalStates.includes(false)) {
+            this.openPositions.push(new Position({
+                id: this.openPositions.length,
+                margin: 0,
+                direction: TradingDirections.Short,
+                entryPrice: this.actualCandle.close!,
+                entryTime: this.actualCandle.closeTime,
+            }))
+        }
+        if ((!this.openPositions.length || this.openPositions[this.openPositions.length - 1].direction != TradingDirections.Long) && !longSignalStates.includes(false)) {
+            this.openPositions.push(new Position({
+                id: this.openPositions.length,
+                margin: 0,
+                direction: TradingDirections.Long,
+                entryPrice: this.actualCandle.close!,
+                entryTime: this.actualCandle.closeTime,
+            }))
 
-    /** Sends a long Position */
-    makeLong = () => {
-        console.log('putting Long on candle: ', this.actualCandle)
-        console.log('Time: ', this.actualCandle.closeTime)
+        }
     }
 
 }

@@ -13,4 +13,8 @@ export default interface PositionConfig extends Entity {
     liquidationPrice?: number,
     /** The direction of the position */
     direction: TradingDirections,
+    /** The Entry Price of the position */
+    entryPrice: number,
+    /** Entry Time of the position */
+    entryTime?: number,
 }
