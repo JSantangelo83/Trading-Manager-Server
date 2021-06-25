@@ -87,6 +87,7 @@ app.get('/test', (req, res) => {
         signals: [longSignal1, longSignal2, shortSignal1, shortSignal2],
         timeFrame: TimeFrame['1h'],
         founds: [100],
+        risk: 1,
         timedCandles: [{
             timeFrame: TimeFrame['1h'],
             candles: candles

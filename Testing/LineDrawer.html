@@ -30,10 +30,10 @@
             for (i = 0; i < array.length; i++) {
                 if (parseInt(array[i]) != -1) {
                     if (iniciated) {
-                        ctx.lineTo(i, c.height - Math.floor(parseInt(array[i]) / 100));
+                        ctx.lineTo(i, c.height - Math.floor(parseInt(array[i]) / 80));
                     } else {
                         ctx.beginPath();
-                        ctx.moveTo(i, c.height - Math.floor(parseInt(array[i]) / 100));
+                        ctx.moveTo(i, c.height - Math.floor(parseInt(array[i]) / 80));
                         iniciated = true
                     }
                 }

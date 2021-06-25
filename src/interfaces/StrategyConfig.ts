@@ -32,4 +32,6 @@ export default interface StrategyConfig {
     startTime?: number,
     /** Account size */
     founds: number[],
+    /** Account risk percentage per trade (default 100%) */
+    risk?: number
 }

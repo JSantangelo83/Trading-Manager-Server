@@ -94,8 +94,8 @@ class Strategy {
             //Agrega una nueva posicion al array de posiciones abiertas
             this.openPositions.short.push(new Position({
                 id: this.openPositions.short.length,
-                margin: this.founds[0],
-                lever: 100,
+                margin: this.founds[0] * (this.risk || 1),
+                lever: 5,
                 direction: TradingDirections.Short,
                 entryPrice: this.actualCandle.close!,
                 entryTime: this.actualCandle.closeTime,
@@ -113,8 +113,8 @@ class Strategy {
             //Agrega una nueva posicion al array de posiciones abiertas
             this.openPositions.long.push(new Position({
                 id: this.openPositions.long.length,
-                margin: this.founds[0],
-                lever: 100,
+                margin: this.founds[0] * (this.risk || 1),
+                lever: 5,
                 direction: TradingDirections.Long,
                 entryPrice: this.actualCandle.close!,
                 entryTime: this.actualCandle.closeTime,
@@ -132,7 +132,7 @@ class Strategy {
 
     updatePositions() {
         this.openPositions.short.concat(this.openPositions.long).forEach(position => {
-            if (position.checkLiquidation(this.actualCandle.low, this.actualCandle.high)) {
+            if (position.checkLimits(this.actualCandle.low, this.actualCandle.high)) {
                 position.close(position.liquidationPrice!, this.actualCandle.closeTime!, this.founds, true)
             }
         })
