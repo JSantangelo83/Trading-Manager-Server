@@ -6,6 +6,11 @@ import TimedCandles from "../interfaces/TimedCandles";
 import Indicator from "./Indicator";
 import Position from "./Position";
 
+interface OpenPositions {
+    short: Position[],
+    long: Position[]
+}
+
 interface Strategy extends strategyConfig { }
 class Strategy {
     //Runtime Properties
@@ -17,7 +22,7 @@ class Strategy {
     /** Candles until `actualCandle` */
     historicalCandles: TimedCandles[] = <TimedCandles[]>[];
     /** Current opened positions */
-    openPositions: Position[] = <Position[]>[];
+    openPositions: OpenPositions = { short: [], long: [] }
 
     constructor(config: strategyConfig) {
         Object.assign(this, config)
@@ -50,6 +55,7 @@ class Strategy {
                     this.actualCandle = candle;
                     this.updateIndicators();
                     this.checkSignals();
+                    this.updatePositions();
                     this.historicalCandles[0].candles.push(candle);
                 })
                 //SAVE INDICATOR VALUES
@@ -79,28 +85,57 @@ class Strategy {
 
     /** Checks the state of the signals and triggers Positions */
     checkSignals() {
+        //Agarro un array de estados por cada direccion de trade
         let shortSignalStates = this.signals.map(signal => signal.direction === TradingDirections.Short ? signal.getState() : undefined).filter(el => el != undefined)
         let longSignalStates = this.signals.map(signal => signal.direction === TradingDirections.Long ? signal.getState() : undefined).filter(el => el != undefined)
-        if ((!this.openPositions.length || this.openPositions[this.openPositions.length - 1].direction != TradingDirections.Short) && !shortSignalStates.includes(false)) {
-            this.openPositions.push(new Position({
-                id: this.openPositions.length,
-                margin: 0,
+
+        //Si todas las señales Short están en true y no hay posiciones abiertas en Short
+        if (!shortSignalStates.includes(false) && !this.openPositions.short.length) {
+            //Agrega una nueva posicion al array de posiciones abiertas
+            this.openPositions.short.push(new Position({
+                id: this.openPositions.short.length,
+                margin: this.founds[0],
+                lever: 100,
                 direction: TradingDirections.Short,
                 entryPrice: this.actualCandle.close!,
                 entryTime: this.actualCandle.closeTime,
             }))
+
+            //Si alguna señal está en false y tengo posiciones abiertas
+        } else if (shortSignalStates.includes(false) && this.openPositions.short.length) {
+            //Cierro las posiciones
+            this.openPositions.short.forEach(pos => pos!.close(this.actualCandle.close!, this.actualCandle.closeTime!, this.founds))
+            //Vacio todas las posiciones
+            this.openPositions.short = <Position[]>[]
         }
-        if ((!this.openPositions.length || this.openPositions[this.openPositions.length - 1].direction != TradingDirections.Long) && !longSignalStates.includes(false)) {
-            this.openPositions.push(new Position({
-                id: this.openPositions.length,
-                margin: 0,
+        //Si todas las señales Long están en true y no hay posiciones abiertas en Long
+        if (!longSignalStates.includes(false) && !this.openPositions.long.length) {
+            //Agrega una nueva posicion al array de posiciones abiertas
+            this.openPositions.long.push(new Position({
+                id: this.openPositions.long.length,
+                margin: this.founds[0],
+                lever: 100,
                 direction: TradingDirections.Long,
                 entryPrice: this.actualCandle.close!,
                 entryTime: this.actualCandle.closeTime,
             }))
 
+            //Si alguna señal está en false y tengo posicinoes abiertas
+        } else if (longSignalStates.includes(false) && this.openPositions.long.length) {
+            //Cierro las posiciones
+            this.openPositions.long.forEach(pos => pos!.close(this.actualCandle.close!, this.actualCandle.closeTime!, this.founds))
+            //Vacio todas las posiciones
+            this.openPositions.long = <Position[]>[]
         }
+
     }
 
+    updatePositions() {
+        this.openPositions.short.concat(this.openPositions.long).forEach(position => {
+            if (position.checkLiquidation(this.actualCandle.low, this.actualCandle.high)) {
+                position.close(position.liquidationPrice!, this.actualCandle.closeTime!, this.founds, true)
+            }
+        })
+    }
 }
 export default Strategy

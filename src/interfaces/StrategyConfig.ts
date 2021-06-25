@@ -30,4 +30,6 @@ export default interface StrategyConfig {
      * Starting time of the simulation (only for testing)
      */
     startTime?: number,
+    /** Account size */
+    founds: number[],
 }

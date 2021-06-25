@@ -42,10 +42,7 @@ class Signal {
     }
 
     getState() {
-        let oldState = this.state
-        this.state = this.calculateNewState();
-        if (oldState != this.state) { return this.state }
-        return false;
+        return this.calculateNewState()
     }
 
 }

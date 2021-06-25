@@ -12,61 +12,81 @@ import Candle from './interfaces/Candle';
 const app = express();
 const PORT = 3000;
 
+app.use(express.json())
+app.use(express.urlencoded())
+
 app.get('/', (req, res) => {
     res.send('test passed')
 })
 
 app.get('/convert', (req, res) => {
-    Helpers.convertAndSave('./src/TestingData/BtcUsdt1h.json');
+    Helpers.convertAndSave(__dirname + '/../Testing/BtcUsdt1h.json');
     res.send('todo piola :D');
+})
+
+app.get('/parseresult', (req, res) => {
+    Helpers.parseResult(__dirname + '/../Testing/results.json');
+    res.send('Parseado pei ;)');
 })
 
 app.get('/test', (req, res) => {
     let slowEma = new MovingAvarage({
         id: 0,
         tag: 'slow',
-        period: 200,
-        type: MovingAvaragesTypes.Simple,
-        source: 'close',
-        timeFrame: TimeFrame['1h'],
-    })
-
-
-    let fastEma = new MovingAvarage({
-        id: 1,
-        tag: 'fast',
-        period: 20,
-        type: MovingAvaragesTypes.Simple,
-        source: 'close',
-        timeFrame: TimeFrame['1h'],
-    })
-
-    let exponentialEma = new MovingAvarage({
-        id: 1,
-        tag: 'exponential',
-        period: 20,
+        period: 18,
         type: MovingAvaragesTypes.Exponential,
         source: 'close',
         timeFrame: TimeFrame['1h'],
     })
 
-    let longSignal = new Signal({
+    let mediumEma = new MovingAvarage({
+        id: 1,
+        tag: 'medium',
+        period: 9,
+        type: MovingAvaragesTypes.Exponential,
+        source: 'close',
+        timeFrame: TimeFrame['1h'],
+    })
+
+    let fastEma = new MovingAvarage({
+        id: 2,
+        tag: 'fast',
+        period: 4,
+        type: MovingAvaragesTypes.Exponential,
+        source: 'close',
+        timeFrame: TimeFrame['1h'],
+    })
+
+    let longSignal1 = new Signal({
         direction: TradingDirections.Long,
-        indicators: [fastEma, slowEma],
+        indicators: [fastEma, mediumEma],
         type: SignalTypes.over
     })
 
-    let shortSignal = new Signal({
-        direction: TradingDirections.Short,
-        indicators: [slowEma, fastEma],
+    let longSignal2 = new Signal({
+        direction: TradingDirections.Long,
+        indicators: [mediumEma, slowEma],
         type: SignalTypes.over
+    })
+
+    let shortSignal1 = new Signal({
+        direction: TradingDirections.Short,
+        indicators: [fastEma, mediumEma],
+        type: SignalTypes.under
+    })
+
+    let shortSignal2 = new Signal({
+        direction: TradingDirections.Short,
+        indicators: [mediumEma, slowEma],
+        type: SignalTypes.under
     })
 
     let fs = require('fs');
     let candles: Candle[] = JSON.parse(fs.readFileSync(__dirname + '/../Testing/BtcUsdt1hConverted.json'));
-    let doubleEmaStrategy = new Strategy({
-        signals: [longSignal, shortSignal],
+    let tripleEmaStrategy = new Strategy({
+        signals: [longSignal1, longSignal2, shortSignal1, shortSignal2],
         timeFrame: TimeFrame['1h'],
+        founds: [100],
         timedCandles: [{
             timeFrame: TimeFrame['1h'],
             candles: candles
