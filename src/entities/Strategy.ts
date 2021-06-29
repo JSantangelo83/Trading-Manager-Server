@@ -52,19 +52,17 @@ class Strategy {
                 let futureCandles = [{ timeFrame: this.timedCandles[0].timeFrame, candles: this.timedCandles[0].candles.filter(c => c.closeTime! > this.startTime!) }];
                 this.indicators.forEach(indicator => indicator.calculateHistory(this.historicalCandles[0].candles));
                 futureCandles[0].candles.forEach(candle => {
-                    if (this.founds[0] < 0) { throw '---------------------------\n You were Liquidated, end of game :c \n ---------------------------' }
+                    if (this.founds[0] < 0) {
+                        this.saveIndicators()
+                        throw '---------------------------\n You were Liquidated, end of game :c \n ---------------------------'
+                    }
                     this.actualCandle = candle;
                     this.updateIndicators();
                     this.checkSignals();
                     this.updatePositions();
                     this.historicalCandles[0].candles.push(candle);
                 })
-                //SAVE INDICATOR VALUES
-                this.indicators.forEach(indicator => {
-                    let fs = require('fs');
-                    fs.writeFileSync(__dirname + '/../../Testing/TMP ' + (indicator.tag || 'indicator' + indicator.id), JSON.stringify(indicator.valueArray).replace('[', '').replace(']', ''));
-                })
-
+                this.saveIndicators()
                 //SAVE SIGNAL VALUES
                 // this.signals.forEach((signal, i) => {
                 //     let fs = require('fs')
@@ -135,6 +133,15 @@ class Strategy {
             if (position.checkLimits(this.actualCandle.low, this.actualCandle.high)) {
                 position.close(position.liquidationPrice!, this.actualCandle.closeTime!, this.founds, true)
             }
+        })
+    }
+
+    //TEMPORALY
+    saveIndicators() {
+        this.indicators.forEach(indicator => {
+            console.log(indicator)
+            let fs = require('fs');
+            fs.writeFileSync(__dirname + '/../../Testing/TMP ' + (indicator.tag || 'indicator' + indicator.id), JSON.stringify(indicator.valueArray).replace('[', '').replace(']', ''));
         })
     }
 }
