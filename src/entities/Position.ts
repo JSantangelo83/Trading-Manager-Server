@@ -26,11 +26,11 @@ class Position {
         let result = tradePercentage > 0
         /** Profit or loss of the trade */
         let profit = Helpers.formatFloat((tradePercentage * this.margin) / 100)
-        //Es una asignación por referencia, uso array porque js los pasa siempre byref
+        //Asignación por referencia, uso array porque js los pasa siempre byref
         founds.unshift(liquidated ? 0 : founds[0] + profit)
         founds.splice(1)
 
-        Helpers.log(`${result ? 'Good' : 'Bad'} ${TradingDirections[this.direction].toString()} ${tradePercentage}% | ${result ? 'Win' : 'Loss'} on account: ${profit} | Duration: ${tradeDuration}h | founds: ${Helpers.formatFloat(founds[0])}`)
+        Helpers.log(`${result ? 'Good' : 'Bad'} ${TradingDirections[this.direction].toString()} ${tradePercentage}% | ${result ? 'Win' : 'Loss'} on account: ${profit} | Duration: ${tradeDuration}h | founds: ${Helpers.formatFloat(founds[0])} ${liquidated ? '| LIQUIDATED' : ''}`)
         //(e: ${this.entryPrice} s:${closePrice}) ${liquidated ? '| LIQUIDATED' : ''}`)
     }
 

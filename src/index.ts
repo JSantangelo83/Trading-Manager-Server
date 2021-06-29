@@ -40,11 +40,9 @@ app.get('/test', (req, res) => {
     let symbol = req.query.symbol
     let interval = req.query.interval
     let nKlines = Number(req.query.nKlines || 0)
-
     let dataReady: boolean = false
     //Error Handling
-    if (!symbol || !interval || !nKlines) res.status(403).send('Must indicate Symbol, Interval and nKlines')
-
+    // if (!symbol || !interval || !nKlines) res.status(403).send('Must indicate Symbol, Interval and nKlines')
     let klines: Candle[]
     axios.get(`${apiUrl}?symbol=${symbol}&interval=${interval}&limit=${(nKlines < 1000 ? nKlines : 1000)}`).then(res => {
         if (nKlines <= 1000) { klines = Helpers.parseBinanceKLines(res.data) }
@@ -160,21 +158,24 @@ app.get('/test', (req, res) => {
 
         let fs = require('fs');
         let candles: Candle[] = JSON.parse(fs.readFileSync(__dirname + '/../Testing/testingCandles.json'));
-
-        let tripleEmaStrategy = new Strategy({
-            signals: [longSignal1, longSignal2, longSignal3, shortSignal1, shortSignal2, shortSignal3],
-            timeFrame: TimeFrame['1h'],
-            founds: [100],
-            risk: 1,
-            timedCandles: [{
+        try {
+            let tripleEmaStrategy = new Strategy({
+                signals: [longSignal1, longSignal2, shortSignal1, shortSignal2],
                 timeFrame: TimeFrame['1h'],
-                candles: candles
-            }],
-            startTime: 1600815599999,
-        })
+                founds: [100],
+                risk: 0.1,
+                timedCandles: [{
+                    timeFrame: TimeFrame['1h'],
+                    candles: candles
+                }],
+                startTime: 1600815599999,
+            })
+        } catch (err) {
+            console.error(err)
+        }
 
         res.send('already did everything')
     }
-})
+}, err => console.error(err))
 
 app.listen(PORT, () => console.log(`Server listening on Port ${PORT}`))

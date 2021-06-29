@@ -30,7 +30,6 @@ export default class RelativeStrengthIndex extends Indicator {
             //Adds today's Candle to the calculation, and takes the avarage
             avarageLoss = avarageLoss + (candle.close! < historicalCandles[historicalCandles.length - 1].close! ? historicalCandles[historicalCandles.length - 1].close! - candle.close! : 0) / _this.period!
             avarageWin = avarageWin + (candle.close! > historicalCandles[historicalCandles.length - 1].close! ? candle.close! - historicalCandles[historicalCandles.length - 1].close! : 0) / _this.period!
-            console.log(avarageWin);
 
             //Calculates RS
             let RS = (this.lastAvarageLoss && this.lastAvarageWin) ? (this.lastAvarageWin / this.lastAvarageLoss) : (avarageWin / avarageLoss)

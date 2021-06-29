@@ -52,6 +52,7 @@ class Strategy {
                 let futureCandles = [{ timeFrame: this.timedCandles[0].timeFrame, candles: this.timedCandles[0].candles.filter(c => c.closeTime! > this.startTime!) }];
                 this.indicators.forEach(indicator => indicator.calculateHistory(this.historicalCandles[0].candles));
                 futureCandles[0].candles.forEach(candle => {
+                    if (this.founds[0] < 0) { throw '---------------------------\n You were Liquidated, end of game :c \n ---------------------------' }
                     this.actualCandle = candle;
                     this.updateIndicators();
                     this.checkSignals();
@@ -94,7 +95,7 @@ class Strategy {
             this.openPositions.short.push(new Position({
                 id: this.openPositions.short.length,
                 margin: this.founds[0] * (this.risk || 1),
-                lever: 5,
+                lever: 10,
                 direction: TradingDirections.Short,
                 entryPrice: this.actualCandle.close!,
                 entryTime: this.actualCandle.closeTime,
@@ -113,7 +114,7 @@ class Strategy {
             this.openPositions.long.push(new Position({
                 id: this.openPositions.long.length,
                 margin: this.founds[0] * (this.risk || 1),
-                lever: 5,
+                lever: 10,
                 direction: TradingDirections.Long,
                 entryPrice: this.actualCandle.close!,
                 entryTime: this.actualCandle.closeTime,
