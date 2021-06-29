@@ -88,7 +88,6 @@ class Strategy {
         //Agarro un array de estados por cada direccion de trade
         let shortSignalStates = this.signals.map(signal => signal.direction === TradingDirections.Short ? signal.getState() : undefined).filter(el => el != undefined)
         let longSignalStates = this.signals.map(signal => signal.direction === TradingDirections.Long ? signal.getState() : undefined).filter(el => el != undefined)
-
         //Si todas las señales Short están en true y no hay posiciones abiertas en Short
         if (!shortSignalStates.includes(false) && !this.openPositions.short.length) {
             //Agrega una nueva posicion al array de posiciones abiertas

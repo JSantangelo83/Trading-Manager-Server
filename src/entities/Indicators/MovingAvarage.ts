@@ -9,22 +9,20 @@ export default class MovingAvarage extends Indicator {
         let _this: MovingAvaragesConfig = <MovingAvaragesConfig>{};
         Object.assign(_this, config);
 
+        //Default Values
+        _this.period = _this.period || 100
+        _this.source = _this.source || 'close'
+
         switch (_this.type) {
             case MovingAvaragesTypes.Simple:
                 _this.formule = (candle: Candle, historicalCandles: Candle[]) => {
                     //TODO Test if any 'candle' hasn't 'source' property. 
-                    if (historicalCandles.length >= _this.period) {
-                        return (historicalCandles.slice(historicalCandles.length - _this.period + 1).map(candle => candle[_this.source]).reduce((vs, v) => vs! + v!)! + candle[_this.source]!) / _this.period
-                    }
-                    return -1
+                    return (historicalCandles.slice(historicalCandles.length - _this.period! + 1).map(candle => candle[_this.source!]).reduce((vs, v) => vs! + v!)! + candle[_this.source!]!) / _this.period!
                 }; break;
             case MovingAvaragesTypes.Exponential:
                 _this.formule = (candle: Candle, historicalCandles: Candle[]) => {
                     //TODO Test if any 'candle' hasn't 'source' property. 
-                    if (historicalCandles.length > _this.period) {
-                        return candle[_this.source]! * (2 / (_this.period + 1)) + (this.valueArray.length ? this.valueArray[this.valueArray.length - 1] : historicalCandles[historicalCandles.length - 1][_this.source]!) * (1 - (2 / (_this.period + 1)))
-                    }
-                    return -1
+                    return candle[_this.source!]! * (2 / (_this.period! + 1)) + (this.valueArray.length ? this.valueArray[this.valueArray.length - 1] : historicalCandles[historicalCandles.length - 1][_this.source!]!) * (1 - (2 / (_this.period! + 1)))
                 }; break;
             case MovingAvaragesTypes.Smoothed: break;
             case MovingAvaragesTypes.LinearWeighted: break;

@@ -8,6 +8,8 @@ import { SignalTypes } from './enums/SignalTypes';
 import TimeFrame from './enums/TimeFrames';
 import Helpers from './Helpers';
 import Candle from './interfaces/Candle';
+import AvarageDirectionalIndex from './entities/Indicators/AvarageDirectionalIndex';
+import Line from './entities/Indicators/Line';
 
 const app = express();
 const PORT = 3000;
@@ -39,6 +41,7 @@ app.get('/test', (req, res) => {
         timeFrame: TimeFrame['1h'],
     })
 
+
     let mediumEma = new MovingAvarage({
         id: 1,
         tag: 'medium',
@@ -57,6 +60,17 @@ app.get('/test', (req, res) => {
         timeFrame: TimeFrame['1h'],
     })
 
+    let adxLine = new Line({
+        id: 5,
+        position: 23
+    })
+
+    let ADX = new AvarageDirectionalIndex({
+        id: 3,
+        tag: 'ADX',
+        timeFrame: TimeFrame['1h'],
+    })
+
     let longSignal1 = new Signal({
         direction: TradingDirections.Long,
         indicators: [fastEma, mediumEma],
@@ -69,6 +83,13 @@ app.get('/test', (req, res) => {
         type: SignalTypes.over
     })
 
+    let longSignal3 = new Signal({
+        direction: TradingDirections.Long,
+        indicators: [ADX, adxLine],
+        type: SignalTypes.over
+    })
+
+
     let shortSignal1 = new Signal({
         direction: TradingDirections.Short,
         indicators: [fastEma, mediumEma],
@@ -79,6 +100,12 @@ app.get('/test', (req, res) => {
         direction: TradingDirections.Short,
         indicators: [mediumEma, slowEma],
         type: SignalTypes.under
+    })
+
+    let shortSignal3 = new Signal({
+        direction: TradingDirections.Short,
+        indicators: [ADX, adxLine],
+        type: SignalTypes.over
     })
 
     let fs = require('fs');

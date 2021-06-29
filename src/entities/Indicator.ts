@@ -15,6 +15,7 @@ abstract class Indicator {
 
         //Error Handling
         if (!this.formule) { throw new Error('The indicator MUST contain a formule') }
+        if (!this.timeFrame) { throw new Error('The indicator MUST have a TimeFrame') }
     }
     /**
      * Calculates all the indicator historical values and saves it to `lastValue` and `valueArray`.
@@ -31,9 +32,13 @@ abstract class Indicator {
      */
     calculateNext(newCandle: Candle, historicalCandles: Candle[]) {
         try {
-            this.lastValue = this.formule!(newCandle, historicalCandles);
+            if (!this.period || (this.period <= historicalCandles.length)) {
+                this.lastValue = this.formule!(newCandle, historicalCandles)
+            }
+            else { this.lastValue = -1 }
         } catch (err) {
             this.valueArray.push(-2);
+            console.error(err)
         }
         this.valueArray.push(this.lastValue);
     }

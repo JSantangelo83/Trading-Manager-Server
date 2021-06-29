@@ -11,5 +11,9 @@ export default interface IndicatorConfig extends Entity {
      */
     formule?: (candle: Candle, historicalCandles: Candle[]) => number
     /** Time Frame of the indicator */
-    timeFrame: TimeFrame
+    timeFrame?: TimeFrame,
+    /** The period of the indicator (if it needs one) */
+    period?: number,
+    /** The source of the indicator */
+    source?: "close" | "high" | "low"; //Needs to improve
 }
