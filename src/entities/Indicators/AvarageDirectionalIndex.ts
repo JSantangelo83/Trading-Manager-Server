@@ -20,7 +20,7 @@ export default class AvarageDirectionalIndex extends Indicator {
             let ApDM: number = 0;
             let AnDM: number = 0;
             //Calculates Avarage +DM,-DM and TR of the period
-            historicalCandles.slice(historicalCandles.length - _this.period!).forEach((hCandle, i: number) => {
+            historicalCandles.slice(historicalCandles.length - _this.period!).forEach((hCandle: Candle, i: number) => {
                 if (i == 0) return
                 ATR += this.calculateTR(hCandle, historicalCandles[i - 1])
                 ApDM += this.calculateDM(hCandle, historicalCandles[i - 1], true)
@@ -32,10 +32,10 @@ export default class AvarageDirectionalIndex extends Indicator {
             ApDM = (ApDM + this.calculateDM(candle, historicalCandles[historicalCandles.length - 1], true)) / _this.period!
             AnDM = (AnDM + this.calculateDM(candle, historicalCandles[historicalCandles.length - 1], false)) / _this.period!
 
-            //Calculates ATR,ApDM and AnDM by using Wilder's Exponential Avarage
-            this.lastATR = this.lastATR ? this.calculateWildersAvarage(this.lastATR, ATR) : ATR
-            this.lastApDM = this.lastApDM ? this.calculateWildersAvarage(this.lastApDM, ApDM) : ApDM
-            this.lastAnDM = this.lastAnDM ? this.calculateWildersAvarage(this.lastAnDM, AnDM) : AnDM
+            //Calculates ATR,ApDM and AnDM by using Wilder's smooth technique
+            this.lastATR = this.lastATR ? Helpers.calculateWildersAvarage(this.lastATR, ATR, _this.period!) : ATR
+            this.lastApDM = this.lastApDM ? Helpers.calculateWildersAvarage(this.lastApDM, ApDM, _this.period!) : ApDM
+            this.lastAnDM = this.lastAnDM ? Helpers.calculateWildersAvarage(this.lastAnDM, AnDM, _this.period!) : AnDM
 
             //Calculates +DI and -DI
             let pDI = Helpers.formatFloat((this.lastApDM / this.lastATR) * 100, 2)
@@ -50,11 +50,13 @@ export default class AvarageDirectionalIndex extends Indicator {
             //Calculates the new value by using Simple Avarage when is enough data
             else if (this.valueArray.length == _this.period! + 1) { newValue = Helpers.formatFloat(this.valueArray.filter(v => v != -1).reduce((vs, v) => v + vs) / _this.period!) }
             //Calculates the new value by using Wilder's Exponential Avarage when is enough data
-            else if (this.valueArray.length > _this.period! + 1) { newValue = this.calculateWildersAvarage(this.valueArray[this.valueArray.length - 1], DX) }
+            else if (this.valueArray.length > _this.period! + 1) { newValue = Helpers.calculateWildersAvarage(this.valueArray[this.valueArray.length - 1], DX, _this.period!) }
 
             return newValue
         }
         super(_this)
+        
+        //Initialize
         this.lastATR = 0;
         this.lastAnDM = 0;
         this.lastApDM = 0;
@@ -81,13 +83,6 @@ export default class AvarageDirectionalIndex extends Indicator {
         } else {
             return (yCandle.low! - tCandle.low!) > (tCandle.high! - yCandle.high!) ? Helpers.formatFloat((yCandle.low! - tCandle.low!)) : 0
         }
-    }
-
-    // private calculateWildersAvarage(lastValue: number, currentValue: number) {
-    //     return Helpers.formatFloat((((this.period! - 1) / this.period!) * lastValue) + (currentValue / this.period!), 4)
-    // }
-    private calculateWildersAvarage(lastValue: number, currentValue: number) {
-        return Helpers.formatFloat(((lastValue * 13) + currentValue) / this.period!)
     }
 
 }
