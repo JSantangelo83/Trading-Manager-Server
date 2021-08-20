@@ -22,13 +22,6 @@ export default class Helpers {
         return ret
     }
 
-    static convertAndSave(filePath: string) {
-        let fs = require('fs');
-        let rawData = JSON.parse(fs.readFileSync(filePath));
-        let convertedData = this.parseBinanceKLines(rawData);
-        fs.writeFileSync(filePath + 'Converted.json', JSON.stringify(convertedData));
-    }
-
     static formatFloat(num: number, decimals: number = 2) { return Number(num.toFixed(decimals)) }
 
     //One of the smooth techniques of Wilder

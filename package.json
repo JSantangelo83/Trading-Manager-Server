@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "tsc-watch": "tsc -w",
-    "nodemon-watch": "nodemon ./build",
+    "nodemon-watch": "nodemon --exitcrash ./build",
     "dev": "concurrently --kill-others \"npm run tsc-watch\" \"npm run nodemon-watch\""
   },
   "keywords": [],
@@ -16,6 +16,7 @@
   "dependencies": {
     "axios": "^0.21.1",
     "concurrently": "^6.2.0",
+    "errorhandler": "^1.5.1",
     "express": "^4.17.1",
     "nodemon": "^2.0.7"
   },

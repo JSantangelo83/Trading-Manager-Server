@@ -12,37 +12,29 @@ import AvarageDirectionalIndex from './entities/Indicators/AvarageDirectionalInd
 import Line from './entities/Indicators/Line';
 import RelativeStrengthIndex from './entities/Indicators/RelativeStrengthIndex';
 import axios, { AxiosResponse } from 'axios';
+import Logger from './entities/Logger';
 
 const app = express();
+const errorHandler = require('errorhandler')
 const PORT = 3000;
 
 app.use(express.json())
 app.use(express.urlencoded())
+app.use(errorHandler({ dumpExceptions: true, showStack: true }));
 
 app.get('/', (req, res) => {
     res.send('test passed')
 })
 
-// app.get('/convert', (req, res) => {
-//     Helpers.convertAndSave(__dirname + '/../Testing/BtcUsdt1h.json');
-//     res.send('todo piola :D');
-// })
-
-// app.get('/parseresult', (req, res) => {
-//     Helpers.parseResult(__dirname + '/../Testing/results.json');
-//     res.send('Parseado pei ;)');
-// })
-
-app.get('/test', (req, res) => {
+app.post('/test', (req, res) => {
 
     let apiUrl = 'https://api1.binance.com/api/v3/klines'
 
-    let symbol = req.query.symbol
-    let interval = req.query.interval
-    let nKlines = Number(req.query.nKlines || 0)
-    let dataReady: boolean = false
+    let symbol = req.body.symbol
+    let interval = req.body.interval
+    let nKlines = Number(req.body.nKlines || 0)
     //Error Handling
-    // if (!symbol || !interval || !nKlines) res.status(403).send('Must indicate Symbol, Interval and nKlines')
+    if (!symbol || !interval || !nKlines) res.status(403).send('Must indicate Symbol, Interval and nKlines')
     let klines: Candle[]
     axios.get(`${apiUrl}?symbol=${symbol}&interval=${interval}&limit=${(nKlines < 1000 ? nKlines : 1000)}`).then(res => {
         if (nKlines <= 1000) { klines = Helpers.parseBinanceKLines(res.data) }
@@ -85,7 +77,6 @@ app.get('/test', (req, res) => {
             timeFrame: TimeFrame['1h'],
         })
 
-
         let mediumEma = new MovingAvarage({
             id: 1,
             tag: 'medium',
@@ -112,12 +103,14 @@ app.get('/test', (req, res) => {
 
         let rsiUpBand = new Line({
             id: 4,
-            position: 70
+            tag: 'RSIUPBand',
+            position: 65
         })
 
         let rsiLowBand = new Line({
             id: 5,
-            position: 30
+            tag: 'RSILowBand',
+            position: 35
         })
 
         let longSignal1 = new Signal({
@@ -135,6 +128,12 @@ app.get('/test', (req, res) => {
         let longSignal3 = new Signal({
             direction: TradingDirections.Long,
             indicators: [RSI, rsiLowBand],
+            type: SignalTypes.under
+        })
+
+        let closeLongSignal = new Signal({
+            direction: TradingDirections.CloseLong,
+            indicators: [fastEma, mediumEma],
             type: SignalTypes.under
         })
 
@@ -156,19 +155,31 @@ app.get('/test', (req, res) => {
             type: SignalTypes.over
         })
 
+        let closeShortSignal = new Signal({
+            direction: TradingDirections.CloseShort,
+            indicators: [fastEma, mediumEma],
+            type: SignalTypes.over
+        })
+
+        let logger = new Logger({
+            path: __dirname + '/../Testing/log' + Date.now()
+        })
         let fs = require('fs');
         let candles: Candle[] = JSON.parse(fs.readFileSync(__dirname + '/../Testing/testingCandles.json'));
         try {
             let tripleEmaStrategy = new Strategy({
-                signals: [longSignal1, longSignal2, shortSignal1, shortSignal2],
+                signals: [longSignal1, longSignal2, closeLongSignal, shortSignal1, shortSignal2, closeShortSignal],
                 timeFrame: TimeFrame['1h'],
                 founds: [100],
-                risk: 0.1,
+                risk: 0.5,
+                leverage: 20,
                 timedCandles: [{
                     timeFrame: TimeFrame['1h'],
                     candles: candles
                 }],
                 startTime: 1600815599999,
+                logger: logger,
+                minimumSize: 2,
             })
         } catch (err) {
             console.error(err)

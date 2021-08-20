@@ -4,6 +4,7 @@ import Candle from "../interfaces/Candle";
 import strategyConfig from "../interfaces/StrategyConfig";
 import TimedCandles from "../interfaces/TimedCandles";
 import Indicator from "./Indicator";
+import Logger from "./Logger";
 import Position from "./Position";
 
 interface OpenPositions {
@@ -52,9 +53,9 @@ class Strategy {
                 let futureCandles = [{ timeFrame: this.timedCandles[0].timeFrame, candles: this.timedCandles[0].candles.filter(c => c.closeTime! > this.startTime!) }];
                 this.indicators.forEach(indicator => indicator.calculateHistory(this.historicalCandles[0].candles));
                 futureCandles[0].candles.forEach(candle => {
-                    if (this.founds[0] < 0) {
+                    if (this.founds[0] < this.minimumSize) {
                         this.saveIndicators()
-                        throw '---------------------------\n You were Liquidated, end of game :c \n ---------------------------'
+                        this.logger.logFinalResult(true);
                     }
                     this.actualCandle = candle;
                     this.updateIndicators();
@@ -62,7 +63,11 @@ class Strategy {
                     this.updatePositions();
                     this.historicalCandles[0].candles.push(candle);
                 })
+                //End of simulation
                 this.saveIndicators()
+                this.logger.logFinalResult(false);
+
+
                 //SAVE SIGNAL VALUES
                 // this.signals.forEach((signal, i) => {
                 //     let fs = require('fs')
@@ -87,24 +92,27 @@ class Strategy {
         //Agarro un array de estados por cada direccion de trade
         let shortSignalStates = this.signals.map(signal => signal.direction === TradingDirections.Short ? signal.getState() : undefined).filter(el => el != undefined)
         let longSignalStates = this.signals.map(signal => signal.direction === TradingDirections.Long ? signal.getState() : undefined).filter(el => el != undefined)
+        let closeShortSignalStates = this.signals.map(signal => signal.direction === TradingDirections.CloseShort ? signal.getState() : undefined).filter(el => el != undefined)
+        let closeLongSignalStates = this.signals.map(signal => signal.direction === TradingDirections.CloseLong ? signal.getState() : undefined).filter(el => el != undefined)
         //Si todas las señales Short están en true y no hay posiciones abiertas en Short
         if (!shortSignalStates.includes(false) && !this.openPositions.short.length) {
             //Agrega una nueva posicion al array de posiciones abiertas
             this.openPositions.short.push(new Position({
                 id: this.openPositions.short.length,
                 margin: this.founds[0] * (this.risk || 1),
-                lever: 10,
+                leverage: this.leverage,
                 direction: TradingDirections.Short,
                 entryPrice: this.actualCandle.close!,
                 entryTime: this.actualCandle.closeTime,
             }))
 
-            //Si alguna señal está en false y tengo posiciones abiertas
-        } else if (shortSignalStates.includes(false) && this.openPositions.short.length) {
+        }
+        //Si hay señal de cerrar shorts y tengo shorts abiertos
+        if (!closeShortSignalStates.includes(false) && this.openPositions.short.length) {
             //Cierro las posiciones
-            this.openPositions.short.forEach(pos => pos!.close(this.actualCandle.close!, this.actualCandle.closeTime!, this.founds))
-            //Vacio todas las posiciones
-            this.openPositions.short = <Position[]>[]
+            this.openPositions.short.forEach(pos => { if (pos.open) this.logger.addResult(pos!.close(this.actualCandle.close!, this.actualCandle.closeTime!, this.founds)) })
+            //Borro las posiciones cerradas del array
+            this.openPositions.short = this.openPositions.short.filter(pos => pos.open)
         }
         //Si todas las señales Long están en true y no hay posiciones abiertas en Long
         if (!longSignalStates.includes(false) && !this.openPositions.long.length) {
@@ -112,18 +120,19 @@ class Strategy {
             this.openPositions.long.push(new Position({
                 id: this.openPositions.long.length,
                 margin: this.founds[0] * (this.risk || 1),
-                lever: 10,
+                leverage: this.leverage,
                 direction: TradingDirections.Long,
                 entryPrice: this.actualCandle.close!,
                 entryTime: this.actualCandle.closeTime,
             }))
 
             //Si alguna señal está en false y tengo posicinoes abiertas
-        } else if (longSignalStates.includes(false) && this.openPositions.long.length) {
+        }
+        if (!closeLongSignalStates.includes(false) && this.openPositions.short.length) {
             //Cierro las posiciones
-            this.openPositions.long.forEach(pos => pos!.close(this.actualCandle.close!, this.actualCandle.closeTime!, this.founds))
-            //Vacio todas las posiciones
-            this.openPositions.long = <Position[]>[]
+            this.openPositions.long.forEach(pos => { if (pos.open) this.logger.addResult(pos!.close(this.actualCandle.close!, this.actualCandle.closeTime!, this.founds)) })
+            //Borro las posiciones cerradas del array
+            this.openPositions.long = this.openPositions.long.filter(pos => pos.open)
         }
 
     }
@@ -131,7 +140,7 @@ class Strategy {
     updatePositions() {
         this.openPositions.short.concat(this.openPositions.long).forEach(position => {
             if (position.checkLimits(this.actualCandle.low, this.actualCandle.high)) {
-                position.close(position.liquidationPrice!, this.actualCandle.closeTime!, this.founds, true)
+                this.logger.addResult(position.close(position.liquidationPrice!, this.actualCandle.closeTime!, this.founds, true))
             }
         })
     }
@@ -139,9 +148,8 @@ class Strategy {
     //TEMPORALY
     saveIndicators() {
         this.indicators.forEach(indicator => {
-            console.log(indicator)
             let fs = require('fs');
-            fs.writeFileSync(__dirname + '/../../Testing/TMP ' + (indicator.tag || 'indicator' + indicator.id), JSON.stringify(indicator.valueArray).replace('[', '').replace(']', ''));
+            fs.writeFileSync(__dirname + '/../../Testing/Indicators/TMP ' + (indicator.tag || 'indicator' + indicator.id), JSON.stringify(indicator.valueArray).replace('[', '').replace(']', ''));
         })
     }
 }

@@ -1,4 +1,6 @@
 export enum TradingDirections {
     Long,
-    Short
+    Short,
+    CloseShort,
+    CloseLong,
 }

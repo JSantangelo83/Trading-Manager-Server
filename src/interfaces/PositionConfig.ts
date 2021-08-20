@@ -8,7 +8,7 @@ export default interface PositionConfig extends Entity {
     /** The Take Profit level */
     takeProfit?: number,
     /** The Leverage of the position (if not Spot) */
-    lever?: number,
+    leverage?: number,
     /** The Liquidation price of the position(if not Spot) */
     liquidationPrice?: number,
     /** The direction of the position */

@@ -1,37 +1,39 @@
 import { TradingDirections } from "../enums/TradingDirections";
 import Helpers from "../Helpers";
 import PositionConfig from "../interfaces/PositionConfig";
+import PositionResult from "../interfaces/PositionResult";
 
 interface Position extends PositionConfig { }
 class Position {
+    open: boolean
     constructor(config: PositionConfig) {
         Object.assign(this, config)
-
+        this.open = true
         //Error Handling
         if (!this.entryPrice || !this.entryTime) { throw new Error('Must indicate Entry Price and Entry Time for testing') }
 
-        if (this.lever) { this.liquidationPrice = this.entryPrice + ((((100 / this.lever) * this.entryPrice) / 100) * (this.direction == TradingDirections.Short ? 1 : -1)) }
+        if (this.leverage) { this.liquidationPrice = this.entryPrice + ((((100 / this.leverage) * this.entryPrice) / 100) * (this.direction == TradingDirections.Short ? 1 : -1)) }
     }
 
-    close(closePrice: number, closeTime: number, founds: number[], liquidated: boolean = false) {
-        /** Porcentaje (win or lose) of the trade */
-        let tradePercentage: number = 0
-        if (this.direction == TradingDirections.Short) { tradePercentage = Helpers.formatFloat((100 - ((closePrice * 100) / this.entryPrice)) * (this.lever || 1)) }
-        if (this.direction == TradingDirections.Long) { tradePercentage = Helpers.formatFloat((((closePrice * 100) / this.entryPrice) - 100) * (this.lever || 1)) }
-
-        /** Duration of the trading (hours) */
-        let tradeDuration = ((closeTime - this.entryTime!) / 3600000)
-
-        /** Result (true for Profit, false for Loss) */
-        let result = tradePercentage > 0
-        /** Profit or loss of the trade */
-        let profit = Helpers.formatFloat((tradePercentage * this.margin) / 100)
+    close(closePrice: number, closeTime: number, founds: number[], liquidated: boolean = false): PositionResult {
+        this.open = false;
+        let ret = {} as PositionResult
+        ret.initialFounds = founds[0]
+        if (this.direction == TradingDirections.Short) { ret.percentage = Helpers.formatFloat((100 - ((closePrice * 100) / this.entryPrice)) * (this.leverage || 1)) }
+        if (this.direction == TradingDirections.Long) { ret.percentage = Helpers.formatFloat((((closePrice * 100) / this.entryPrice) - 100) * (this.leverage || 1)) }
+        ret.closeTime = closeTime
+        ret.duration = Helpers.formatFloat(((ret.closeTime - this.entryTime!) / 3600000))
+        ret.result = ret.percentage > 0
+        ret.profit = Helpers.formatFloat((ret.percentage * this.margin) / 100)
         //Asignación por referencia, uso array porque js los pasa siempre byref
-        founds.unshift(liquidated ? 0 : founds[0] + profit)
+        ret.initialFounds = founds[0]
+        founds.unshift(((Math.abs(ret.profit) >= founds[0]) && ret.profit < 0) ? 0 : founds[0] + ret.profit)
         founds.splice(1)
+        ret.finalFounds = founds[0]
+        ret.liquidated = liquidated || ret.finalFounds <= 0
+        ret.direction = this.direction
 
-        Helpers.log(`${result ? 'Good' : 'Bad'} ${TradingDirections[this.direction].toString()} ${tradePercentage}% | ${result ? 'Win' : 'Loss'} on account: ${profit} | Duration: ${tradeDuration}h | founds: ${Helpers.formatFloat(founds[0])} ${liquidated ? '| LIQUIDATED' : ''}`)
-        //(e: ${this.entryPrice} s:${closePrice}) ${liquidated ? '| LIQUIDATED' : ''}`)
+        return ret
     }
 
     checkLimits(priceLow: number = 0, priceHigh: number = 0) {

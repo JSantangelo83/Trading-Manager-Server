@@ -1,3 +1,4 @@
+import Logger from "../entities/Logger";
 import Signal from "../entities/Signal";
 import TimeFrame from "../enums/TimeFrames";
 import Candle from "./Candle";
@@ -34,4 +35,10 @@ export default interface StrategyConfig {
     founds: number[],
     /** Account risk percentage per trade (default 100%) */
     risk?: number
+    /** Leverage of the positions (if any) */
+    leverage?: number
+    /** The logger of the strategy */
+    logger: Logger
+    /** Minimum size of account (if less, you cannot open any position) */
+    minimumSize: number,
 }

@@ -1,2 +1,10 @@
 node_modules
 build/*
+build/Helpers.js
+build/index.js
+build/entities/indicator.js
+build/entities/Signal.js
+build/entities/Strategy.js
+build/entities/Indicators/MovingAvarage.js
+build/enums/TimeFrames.js
+src/Helpers.js

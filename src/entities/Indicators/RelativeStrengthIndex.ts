@@ -20,16 +20,18 @@ export default class RelativeStrengthIndex extends Indicator {
             let avarageLoss: number = 0
             let avarageWin: number = 0
 
-            //Calculates AvarageLoss and AvarageWin of the period
-            historicalCandles.slice(historicalCandles.length - _this.period!).forEach((hCandle: Candle, i: number) => {
-                if (i == 0) return
-                avarageLoss += hCandle.close! < historicalCandles[i - 1].close! ? historicalCandles[i - 1].close! - hCandle.close! : 0
-                avarageWin += hCandle.close! > historicalCandles[i - 1].close! ? hCandle.close! - historicalCandles[i - 1].close! : 0
-            })
+            //It is used to slice the array
+            let historicalPeriodPosition = historicalCandles.length - _this.period!
 
+            //Calculates AvarageLoss and AvarageWin of the period
+            historicalCandles.slice(historicalPeriodPosition).forEach((hCandle: Candle, i: number) => {
+                if (i == 0) return
+                avarageLoss += hCandle.close! < historicalCandles[historicalPeriodPosition + i - 1].close! ? historicalCandles[historicalPeriodPosition + i - 1].close! - hCandle.close! : 0
+                avarageWin += hCandle.close! > historicalCandles[historicalPeriodPosition + i - 1].close! ? hCandle.close! - historicalCandles[historicalPeriodPosition + i - 1].close! : 0
+            })
             //Adds today's Candle to the calculation, and takes the avarage
-            avarageLoss = avarageLoss + (candle.close! < historicalCandles[historicalCandles.length - 1].close! ? historicalCandles[historicalCandles.length - 1].close! - candle.close! : 0) / _this.period!
-            avarageWin = avarageWin + (candle.close! > historicalCandles[historicalCandles.length - 1].close! ? candle.close! - historicalCandles[historicalCandles.length - 1].close! : 0) / _this.period!
+            avarageLoss = Helpers.formatFloat((avarageLoss + (candle.close! < historicalCandles[historicalCandles.length - 1].close! ? historicalCandles[historicalCandles.length - 1].close! - candle.close! : 0)) / _this.period!)
+            avarageWin = Helpers.formatFloat((avarageWin + (candle.close! > historicalCandles[historicalCandles.length - 1].close! ? candle.close! - historicalCandles[historicalCandles.length - 1].close! : 0)) / _this.period!)
 
             //Calculates RS
             let RS = (this.lastAvarageLoss && this.lastAvarageWin) ? (this.lastAvarageWin / this.lastAvarageLoss) : (avarageWin / avarageLoss)
@@ -40,9 +42,8 @@ export default class RelativeStrengthIndex extends Indicator {
             this.lastRS = this.lastRS ? Helpers.calculateWildersAvarage(this.lastRS, RS, _this.period!) : RS
 
             //Calculates RSI
-            let RSI = 100 - (100 / RS + 1)
-
-
+            let RSI = Helpers.formatFloat(100 - (100 / (this.lastRS + 1)))
+            // console.log(RSI)
             return RSI
         };
         super(<IndicatorConfig>_this)
