@@ -101,6 +101,7 @@ app.post('/test', (req, res) => {
             timeFrame: TimeFrame['1h'],
         })
 
+
         let rsiUpBand = new Line({
             id: 4,
             tag: 'RSIUPBand',
@@ -111,6 +112,18 @@ app.post('/test', (req, res) => {
             id: 5,
             tag: 'RSILowBand',
             position: 35
+        })
+
+        let ADX = new AvarageDirectionalIndex({
+            id: 6,
+            tag: 'ADX',
+            timeFrame: TimeFrame['1h'],
+        })
+
+        let adxLine = new Line({
+            id: 7,
+            tag: 'ADXLine',
+            position: 60
         })
 
         let longSignal1 = new Signal({
@@ -125,10 +138,16 @@ app.post('/test', (req, res) => {
             type: SignalTypes.over
         })
 
-        let longSignal3 = new Signal({
+        let longSignalRSI = new Signal({
             direction: TradingDirections.Long,
             indicators: [RSI, rsiLowBand],
             type: SignalTypes.under
+        })
+
+        let longSignalADX = new Signal({
+            direction: TradingDirections.Long,
+            indicators: [ADX, adxLine],
+            type: SignalTypes.over
         })
 
         let closeLongSignal = new Signal({
@@ -149,9 +168,15 @@ app.post('/test', (req, res) => {
             type: SignalTypes.under
         })
 
-        let shortSignal3 = new Signal({
+        let shortSignalRSI = new Signal({
             direction: TradingDirections.Short,
             indicators: [RSI, rsiUpBand],
+            type: SignalTypes.over
+        })
+
+        let shortSignalADX = new Signal({
+            direction: TradingDirections.Short,
+            indicators: [ADX, adxLine],
             type: SignalTypes.over
         })
 
@@ -168,7 +193,7 @@ app.post('/test', (req, res) => {
         let candles: Candle[] = JSON.parse(fs.readFileSync(__dirname + '/../Testing/testingCandles.json'));
         try {
             let tripleEmaStrategy = new Strategy({
-                signals: [longSignal1, longSignal2, closeLongSignal, shortSignal1, shortSignal2, closeShortSignal],
+                signals: [longSignal1, longSignal2, longSignalADX, closeLongSignal, shortSignal1, shortSignal2, shortSignalADX, closeShortSignal],
                 timeFrame: TimeFrame['1h'],
                 founds: [100],
                 risk: 0.5,
