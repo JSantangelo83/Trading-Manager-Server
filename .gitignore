@@ -9,3 +9,4 @@ build/entities/Indicators/MovingAvarage.js
 build/enums/TimeFrames.js
 src/Helpers.js
 Testing/*
+!Testing/LineDrawer.html
