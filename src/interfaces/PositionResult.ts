@@ -1,3 +1,4 @@
+import ClosePositionReason from "../enums/ClosePositionReason";
 import { TradingDirections } from "../enums/TradingDirections";
 import PositionConfig from "./PositionConfig";
 
@@ -14,6 +15,6 @@ export default interface PositionResult extends PositionConfig {
     closeTime: number,
     /** The profit/loss percentage */
     percentage: number,
-    /** If got liquidated on this position */
-    liquidated: boolean
+    /** Reason why the position was closed */
+    reason: ClosePositionReason,
 }
