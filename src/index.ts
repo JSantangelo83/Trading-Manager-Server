@@ -123,7 +123,12 @@ app.post('/test', (req, res) => {
         let adxLine = new Line({
             id: 7,
             tag: 'ADXLine',
-            position: 60
+            position: 35
+        })
+        let adxCloseLine = new Line({
+            id: 8,
+            tag: 'ADXLine',
+            position: 30
         })
 
         let longSignal1 = new Signal({
@@ -150,9 +155,15 @@ app.post('/test', (req, res) => {
             type: SignalTypes.over
         })
 
-        let closeLongSignal = new Signal({
+        let closeLongSignal1 = new Signal({
             direction: TradingDirections.CloseLong,
             indicators: [fastEma, mediumEma],
+            type: SignalTypes.under
+        })
+
+        let closeLongSignal2 = new Signal({
+            direction: TradingDirections.CloseLong,
+            indicators: [ADX, adxCloseLine],
             type: SignalTypes.under
         })
 
@@ -180,10 +191,16 @@ app.post('/test', (req, res) => {
             type: SignalTypes.over
         })
 
-        let closeShortSignal = new Signal({
+        let closeShortSignal1 = new Signal({
             direction: TradingDirections.CloseShort,
             indicators: [fastEma, mediumEma],
             type: SignalTypes.over
+        })
+
+        let closeShortSignal2 = new Signal({
+            direction: TradingDirections.CloseShort,
+            indicators: [ADX, adxCloseLine],
+            type: SignalTypes.under
         })
 
         let logger = new Logger({
@@ -193,11 +210,11 @@ app.post('/test', (req, res) => {
         let candles: Candle[] = JSON.parse(fs.readFileSync(__dirname + '/../Testing/testingCandles.json'));
         try {
             let tripleEmaStrategy = new Strategy({
-                signals: [longSignal1, longSignal2, longSignalADX, closeLongSignal, shortSignal1, shortSignal2, shortSignalADX, closeShortSignal],
+                signals: [longSignal1, longSignal2, longSignalADX, closeLongSignal1, closeLongSignal2, shortSignal1, shortSignal2, shortSignalADX, closeShortSignal1, closeShortSignal2],
                 timeFrame: TimeFrame['1h'],
                 founds: [100],
                 risk: 0.5,
-                leverage: 20,
+                leverage: 5,
                 timedCandles: [{
                     timeFrame: TimeFrame['1h'],
                     candles: candles

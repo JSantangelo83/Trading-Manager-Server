@@ -62,7 +62,7 @@ export default class AvarageDirectionalIndex extends Indicator {
             //Calculates the new value by using Wilder's Exponential Avarage when is enough data
             else if (this.valueArray.filter(v => v != -1).length > _this.period! + 1) { newValue = Helpers.calculateWildersAvarage(this.lastDX[this.lastDX.length - 1], DX, _this.period!) }
 
-            return newValue
+            return Helpers.formatFloat(newValue)
         }
         super(_this)
 
