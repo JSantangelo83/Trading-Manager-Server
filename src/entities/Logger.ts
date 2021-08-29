@@ -33,8 +33,8 @@ export default class Logger {
         let wins = this.results.map(res => res.result).filter(result => result).length
         let losses = this.results.map(res => res.result).filter(result => !result).length
         let accurate = (wins * 100) / openedPositions
-        let avarageWin = Helpers.formatFloat(this.results.map(res => res.profit).filter(profit => profit > 0).reduce((p, c) => p + c) / this.results.map(res => res.profit).filter(profit => profit > 0).length)
-        let avarageLoss = Helpers.formatFloat(this.results.map(res => res.profit).filter(profit => profit < 0).reduce((p, c) => p + c) / this.results.map(res => res.profit).filter(profit => profit > 0).length)
+        let avarageWin = Helpers.formatFloat(this.results.map(res => res.profit).filter(profit => profit > 0).reduce((p, c) => p + c, 0) / this.results.map(res => res.profit).filter(profit => profit > 0).length)
+        let avarageLoss = Helpers.formatFloat(this.results.map(res => res.profit).filter(profit => profit < 0).reduce((p, c) => p + c, 0) / this.results.map(res => res.profit).filter(profit => profit > 0).length)
         let finalSize = Helpers.formatFloat(this.results[this.results.length - 1].finalFounds)
         //Logging
         // console.log('')

@@ -59,8 +59,8 @@ class Strategy {
                     }
                     this.actualCandle = candle;
                     this.updateIndicators();
-                    this.checkSignals();
                     this.updatePositions();
+                    this.checkSignals();
                     this.historicalCandles[0].candles.push(candle);
                 })
                 //End of simulation
@@ -96,6 +96,9 @@ class Strategy {
         let closeLongSignalStates = this.signals.map(signal => signal.direction === TradingDirections.CloseLong ? signal.getState() : undefined).filter(el => el != undefined)
         //Si todas las señales Short están en true y no hay posiciones abiertas en Short
         if (!shortSignalStates.includes(false) && !this.openPositions.short.length) {
+            //Calcula el margin de la posicion
+            let margin = this.founds[0] * (this.risk || 1)
+
             //Agrega una nueva posicion al array de posiciones abiertas
             this.openPositions.short.push(new Position({
                 id: this.openPositions.short.length,
@@ -104,7 +107,12 @@ class Strategy {
                 direction: TradingDirections.Short,
                 entryPrice: this.actualCandle.close!,
                 entryTime: this.actualCandle.closeTime,
+                initialFounds: this.founds[0],
             }))
+
+            //Resta el margin a los fondos totales
+            this.founds.unshift(this.founds[0] - margin);
+            this.founds.splice(1);
 
         }
         //Si hay señal de cerrar shorts y tengo shorts abiertos
@@ -116,18 +124,24 @@ class Strategy {
         }
         //Si todas las señales Long están en true y no hay posiciones abiertas en Long
         if (!longSignalStates.includes(false) && !this.openPositions.long.length) {
+            //Calcula el margin de la posicion
+            let margin = this.founds[0] * (this.risk || 1)
             //Agrega una nueva posicion al array de posiciones abiertas
             this.openPositions.long.push(new Position({
                 id: this.openPositions.long.length,
-                margin: this.founds[0] * (this.risk || 1),
+                margin: margin,
                 leverage: this.leverage,
                 direction: TradingDirections.Long,
                 entryPrice: this.actualCandle.close!,
                 entryTime: this.actualCandle.closeTime,
+                initialFounds: this.founds[0],
             }))
+            //Resta el margin a los fondos totales
+            this.founds.unshift(this.founds[0] - margin);
+            this.founds.splice(1);
 
-            //Si alguna señal está en false y tengo posicinoes abiertas
         }
+        //Si alguna señal está en false y tengo posicinoes abiertas
         if (!closeLongSignalStates.includes(false) && this.openPositions.short.length) {
             //Cierro las posiciones
             this.openPositions.long.forEach(pos => { if (pos.open) this.logger.addResult(pos!.close(this.actualCandle.close!, this.actualCandle.closeTime!, this.founds)) })

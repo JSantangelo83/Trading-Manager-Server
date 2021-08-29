@@ -8,8 +8,6 @@ export default interface PositionResult extends PositionConfig {
     result: boolean,
     /** Profit (or loss) taked from the trade */
     profit: number,
-    /** Founds that were in the account before the trade was made */
-    initialFounds: number,
     /** Founds that left on the account after the trade was made */
     finalFounds: number,
     /** Close time of the Trade (miliseconds) */
