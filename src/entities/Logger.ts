@@ -1,3 +1,4 @@
+import ClosePositionReason from "../enums/ClosePositionReason";
 import { TradingDirections } from "../enums/TradingDirections";
 import Helpers from "../Helpers";
 import LoggerConfig from "../interfaces/LoggerConfig";
@@ -17,7 +18,7 @@ export default class Logger {
 
     addResult(result: PositionResult) {
         this.results.push(result)
-        let logLine = `${result.result ? 'Good' : 'Bad'} ${TradingDirections[result.direction].toString()} ${result.percentage}% | ${result.result ? 'Win' : 'Loss'} on account: ${result.profit} | Duration: ${result.duration}h | from: ${Helpers.formatFloat(result.initialFounds)} to ${Helpers.formatFloat(result.finalFounds)} founds. ${result.liquidated || result.finalFounds <= 0 ? '| LIQUIDATED' : ''}`
+        let logLine = `${Math.abs(result.percentage) > 50 ? ' VERY' : ''} ${result.result ? 'Good' : 'Bad'} ${TradingDirections[result.direction].toString()} ${result.percentage}% | ${result.result ? 'Win' : 'Loss'} on account: ${result.profit} | Duration: ${result.duration}h | from: ${Helpers.formatFloat(result.initialFounds)} to ${Helpers.formatFloat(result.finalFounds)} founds. ${ClosePositionReason[result.reason]}`
         this.log.push(logLine)
     }
 

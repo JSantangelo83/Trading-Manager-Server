@@ -17,8 +17,6 @@ export default interface PositionConfig extends Entity {
     entryPrice: number,
     /** Entry Time of the position */
     entryTime?: number,
-    /**
-     * Founds at the opening time
-     */
+    /** Founds at the opening time*/
     initialFounds: number,
 }

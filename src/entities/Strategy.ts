@@ -1,3 +1,4 @@
+import ClosePositionReason from "../enums/ClosePositionReason";
 import TimeFrame from "../enums/TimeFrames";
 import { TradingDirections } from "../enums/TradingDirections";
 import Candle from "../interfaces/Candle";
@@ -107,6 +108,7 @@ class Strategy {
                 direction: TradingDirections.Short,
                 entryPrice: this.actualCandle.close!,
                 entryTime: this.actualCandle.closeTime,
+                stopLoss: 7,
                 initialFounds: this.founds[0],
             }))
 
@@ -118,7 +120,7 @@ class Strategy {
         //Si hay señal de cerrar shorts y tengo shorts abiertos
         if (!closeShortSignalStates.includes(false) && this.openPositions.short.length) {
             //Cierro las posiciones
-            this.openPositions.short.forEach(pos => { if (pos.open) this.logger.addResult(pos!.close(this.actualCandle.close!, this.actualCandle.closeTime!, this.founds)) })
+            this.openPositions.short.forEach(pos => { if (pos.open) this.logger.addResult(pos!.close(this.actualCandle.close!, this.actualCandle.closeTime!, this.founds, ClosePositionReason.Signal)) })
             //Borro las posiciones cerradas del array
             this.openPositions.short = this.openPositions.short.filter(pos => pos.open)
         }
@@ -134,6 +136,7 @@ class Strategy {
                 direction: TradingDirections.Long,
                 entryPrice: this.actualCandle.close!,
                 entryTime: this.actualCandle.closeTime,
+                stopLoss: 7,
                 initialFounds: this.founds[0],
             }))
             //Resta el margin a los fondos totales
@@ -144,7 +147,7 @@ class Strategy {
         //Si alguna señal está en false y tengo posicinoes abiertas
         if (!closeLongSignalStates.includes(false) && this.openPositions.short.length) {
             //Cierro las posiciones
-            this.openPositions.long.forEach(pos => { if (pos.open) this.logger.addResult(pos!.close(this.actualCandle.close!, this.actualCandle.closeTime!, this.founds)) })
+            this.openPositions.long.forEach(pos => { if (pos.open) this.logger.addResult(pos!.close(this.actualCandle.close!, this.actualCandle.closeTime!, this.founds, ClosePositionReason.Signal)) })
             //Borro las posiciones cerradas del array
             this.openPositions.long = this.openPositions.long.filter(pos => pos.open)
         }
@@ -153,10 +156,11 @@ class Strategy {
 
     updatePositions() {
         this.openPositions.short.concat(this.openPositions.long).forEach(position => {
-            if (position.checkLimits(this.actualCandle.low, this.actualCandle.high)) {
-                this.logger.addResult(position.close(position.liquidationPrice!, this.actualCandle.closeTime!, this.founds, true))
-            }
+            let closing = position.getCrossedLimitPrice(this.actualCandle.low, this.actualCandle.high)
+            if (closing![0]) this.logger.addResult(position.close(closing[0], this.actualCandle.closeTime!, this.founds, closing[1]!))
         })
+        //Borro las posiciones cerradas del array
+        this.openPositions.long = this.openPositions.long.filter(pos => pos.open)
     }
 
     //TEMPORALY
