@@ -159,6 +159,8 @@ class Strategy {
             let closing = position.getCrossedLimitPrice(this.actualCandle.low, this.actualCandle.high)
             if (closing![0]) this.logger.addResult(position.close(closing[0], this.actualCandle.closeTime!, this.founds, closing[1]!))
         })
+        //Borro las posiciones cerradas del array
+        this.openPositions.long = this.openPositions.long.filter(pos => pos.open)
     }
 
     //TEMPORALY
