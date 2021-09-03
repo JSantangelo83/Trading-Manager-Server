@@ -75,6 +75,7 @@ app.post('/test', (req, res) => {
             type: MovingAvaragesTypes.Exponential,
             source: 'close',
             timeFrame: TimeFrame['1h'],
+            chart: 0,
         })
 
         let mediumEma = new MovingAvarage({
@@ -84,6 +85,7 @@ app.post('/test', (req, res) => {
             type: MovingAvaragesTypes.Exponential,
             source: 'close',
             timeFrame: TimeFrame['1h'],
+            chart: 0,
         })
 
         let fastEma = new MovingAvarage({
@@ -93,42 +95,51 @@ app.post('/test', (req, res) => {
             type: MovingAvaragesTypes.Exponential,
             source: 'close',
             timeFrame: TimeFrame['1h'],
+            chart: 0,
         })
 
         let RSI = new RelativeStrengthIndex({
             id: 3,
             tag: 'RSI',
             timeFrame: TimeFrame['1h'],
+            chart: 1,
         })
 
 
         let rsiUpBand = new Line({
+
             id: 4,
             tag: 'RSIUPBand',
-            position: 65
+            position: 65,
+            chart: 1
         })
 
         let rsiLowBand = new Line({
+
             id: 5,
             tag: 'RSILowBand',
-            position: 35
+            position: 35,
+            chart: 1
         })
 
         let ADX = new AvarageDirectionalIndex({
             id: 6,
             tag: 'ADX',
             timeFrame: TimeFrame['1h'],
+            chart: 1
         })
 
         let adxLine = new Line({
             id: 7,
-            tag: 'ADXLine',
-            position: 35
+            tag: 'ADX Open Line',
+            position: 35,
+            chart: 1
         })
         let adxCloseLine = new Line({
             id: 8,
-            tag: 'ADXLine',
-            position: 30
+            tag: 'ADX Close Line',
+            position: 30,
+            chart: 1
         })
 
         let longSignal1 = new Signal({
@@ -207,7 +218,7 @@ app.post('/test', (req, res) => {
             path: __dirname + '/../Testing/log' + Date.now(),
             saveLog: false,
         })
-        
+
         let fs = require('fs');
         let candles: Candle[] = JSON.parse(fs.readFileSync(__dirname + '/../Testing/testingCandles.json'));
         var tripleEmaStrategy = new Strategy({
@@ -230,8 +241,9 @@ app.post('/test', (req, res) => {
         tripleEmaStrategy.initializeStrategy().then(msg => {
             res.send({
                 indicators: tripleEmaStrategy.indicators.map(indicator => Object({
+                    chart: indicator.chart,
                     tag: indicator.tag,
-                    values: indicator.valueArray,
+                    values: indicator.valueArray.slice(100),
                 })),
                 results: logger.results
             })

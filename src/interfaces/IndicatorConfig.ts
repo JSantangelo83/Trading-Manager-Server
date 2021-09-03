@@ -16,4 +16,6 @@ export default interface IndicatorConfig extends Entity {
     period?: number,
     /** The source of the indicator */
     source?: "close" | "high" | "low"; //Needs to improve
+    /** The chart number where it will be rendered */
+    chart: number, //Needs to improve
 }
