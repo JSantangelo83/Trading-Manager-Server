@@ -38,47 +38,47 @@ class Strategy {
                 };
             })
         })
-
-        this.initializeStrategy()
     }
 
     /** Loads historical values of indicators. Then start listening to websocket if any */
     initializeStrategy() {
-        if (this.url) {
-            //TODO handle urls
-        } else if (this.timedCandles && this.startTime) {
-            if (Object.keys(this.timedCandles).length > 1) {
-                //TODO Handle Multi-TimeFrames
+        return new Promise((resolve, reject) => {
+            if (this.url) {
+                //TODO handle urls
+            } else if (this.timedCandles && this.startTime) {
+                if (Object.keys(this.timedCandles).length > 1) {
+                    //TODO Handle Multi-TimeFrames
+                } else {
+                    this.historicalCandles = [{ timeFrame: this.timedCandles[0].timeFrame, candles: this.timedCandles[0].candles.filter(c => c.closeTime! <= this.startTime!) }];
+                    let futureCandles = [{ timeFrame: this.timedCandles[0].timeFrame, candles: this.timedCandles[0].candles.filter(c => c.closeTime! > this.startTime!) }];
+                    this.indicators.forEach(indicator => indicator.calculateHistory(this.historicalCandles[0].candles));
+                    futureCandles[0].candles.forEach(candle => {
+                        if (this.founds[0] < this.minimumSize) {
+                            this.saveIndicators()
+                            this.logger.logFinalResult(true);
+                        }
+                        this.actualCandle = candle;
+                        this.updateIndicators();
+                        this.updatePositions();
+                        this.checkSignals();
+                        this.historicalCandles[0].candles.push(candle);
+                    })
+                    //End of simulation
+                    this.saveIndicators()
+                    this.logger.logFinalResult(false);
+                    resolve('Simulación Finalizada')
+
+                    //SAVE SIGNAL VALUES
+                    // this.signals.forEach((signal, i) => {
+                    //     let fs = require('fs')
+                    //     fs.writeFileSync('TMP signal ' + i, JSON.stringify(signal.test))
+                    // })
+                }
+
             } else {
-                this.historicalCandles = [{ timeFrame: this.timedCandles[0].timeFrame, candles: this.timedCandles[0].candles.filter(c => c.closeTime! <= this.startTime!) }];
-                let futureCandles = [{ timeFrame: this.timedCandles[0].timeFrame, candles: this.timedCandles[0].candles.filter(c => c.closeTime! > this.startTime!) }];
-                this.indicators.forEach(indicator => indicator.calculateHistory(this.historicalCandles[0].candles));
-                futureCandles[0].candles.forEach(candle => {
-                    if (this.founds[0] < this.minimumSize) {
-                        this.saveIndicators()
-                        this.logger.logFinalResult(true);
-                    }
-                    this.actualCandle = candle;
-                    this.updateIndicators();
-                    this.updatePositions();
-                    this.checkSignals();
-                    this.historicalCandles[0].candles.push(candle);
-                })
-                //End of simulation
-                this.saveIndicators()
-                this.logger.logFinalResult(false);
-
-
-                //SAVE SIGNAL VALUES
-                // this.signals.forEach((signal, i) => {
-                //     let fs = require('fs')
-                //     fs.writeFileSync('TMP signal ' + i, JSON.stringify(signal.test))
-                // })
+                reject('Must give an url or candles')
             }
-
-        } else {
-            throw new Error('Must give an url or candles')
-        }
+        })
     }
 
     /** Updates all the indicator's values */

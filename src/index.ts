@@ -208,28 +208,36 @@ app.post('/test', (req, res) => {
         })
         let fs = require('fs');
         let candles: Candle[] = JSON.parse(fs.readFileSync(__dirname + '/../Testing/testingCandles.json'));
-        try {
-            let tripleEmaStrategy = new Strategy({
-                signals: [longSignal1, longSignal2, longSignalADX, closeLongSignal1, closeLongSignal2, shortSignal1, shortSignal2, shortSignalADX, closeShortSignal1, closeShortSignal2],
+        var tripleEmaStrategy = new Strategy({
+            signals: [longSignal1, longSignal2, longSignalADX, closeLongSignal1, closeLongSignal2, shortSignal1, shortSignal2, shortSignalADX, closeShortSignal1, closeShortSignal2],
+            timeFrame: TimeFrame['1h'],
+            founds: [100],
+            risk: 0.5,
+            leverage: 5,
+            timedCandles: [{
                 timeFrame: TimeFrame['1h'],
-                founds: [100],
-                risk: 0.5,
-                leverage: 5,
-                timedCandles: [{
-                    timeFrame: TimeFrame['1h'],
-                    candles: candles
-                }],
-                startTime: 1600815599999,
-                stopLoss: 8,
-                takeProfit: 18,
-                logger: logger,
-                minimumSize: 2,
-            })
-        } catch (err) {
-            console.error(err)
-        }
+                candles: candles
+            }],
+            startTime: 1600815599999,
+            stopLoss: 8,
+            takeProfit: 18,
+            logger: logger,
+            minimumSize: 2,
+        })
 
-        res.send(logger.results)
+        tripleEmaStrategy.initializeStrategy().then(msg => {
+            res.send({
+                indicators: tripleEmaStrategy.indicators.map(indicator => Object({
+                    tag: indicator.tag,
+                    values: indicator.valueArray,
+                })),
+                results: logger.results
+            })
+        }).catch(err => {
+            console.error(err)
+            res.send(err).status(500)
+        })
+
     }
 }, err => console.error(err))
 

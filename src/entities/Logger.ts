@@ -65,7 +65,5 @@ export default class Logger {
         let fs = require('fs');
         fs.writeFileSync(__dirname + '/../../Testing/Log' + Date.now() + '.json', JSON.stringify(this.log))
 
-        throw 'Simulación Finalizada'
-
     }
 }
