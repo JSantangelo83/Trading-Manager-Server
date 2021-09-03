@@ -204,8 +204,10 @@ app.post('/test', (req, res) => {
         })
 
         let logger = new Logger({
-            path: __dirname + '/../Testing/log' + Date.now()
+            path: __dirname + '/../Testing/log' + Date.now(),
+            saveLog: false,
         })
+        
         let fs = require('fs');
         let candles: Candle[] = JSON.parse(fs.readFileSync(__dirname + '/../Testing/testingCandles.json'));
         var tripleEmaStrategy = new Strategy({

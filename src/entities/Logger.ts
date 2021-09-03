@@ -62,8 +62,11 @@ export default class Logger {
         this.log.push(`Accurate: ${Helpers.formatFloat(accurate)}%`)
         this.log.push('---------------------------------------------------------------------')
 
-        let fs = require('fs');
-        fs.writeFileSync(__dirname + '/../../Testing/Log' + Date.now() + '.json', JSON.stringify(this.log))
+        // if(this.saveLog){             This. not working in this class
+        if (false) {
+            let fs = require('fs');
+            fs.writeFileSync(__dirname + '/../../Testing/Log' + Date.now() + '.json', JSON.stringify(this.log))
+        }
 
     }
 }
