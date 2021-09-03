@@ -220,6 +220,8 @@ app.post('/test', (req, res) => {
                     candles: candles
                 }],
                 startTime: 1600815599999,
+                stopLoss: 8,
+                takeProfit: 18,
                 logger: logger,
                 minimumSize: 2,
             })
@@ -227,7 +229,7 @@ app.post('/test', (req, res) => {
             console.error(err)
         }
 
-        res.send('already did everything')
+        res.send(logger.results)
     }
 }, err => console.error(err))
 

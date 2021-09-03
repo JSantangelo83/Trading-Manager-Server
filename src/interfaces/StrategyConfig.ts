@@ -41,4 +41,8 @@ export default interface StrategyConfig {
     logger: Logger
     /** Minimum size of account (if less, you cannot open any position) */
     minimumSize: number,
+    /** Stop Loss for positions (%) */
+    stopLoss?: number,
+    /** Take Profit for positions (%) */
+    takeProfit?: number,
 }

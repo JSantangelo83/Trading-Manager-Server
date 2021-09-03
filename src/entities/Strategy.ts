@@ -108,7 +108,8 @@ class Strategy {
                 direction: TradingDirections.Short,
                 entryPrice: this.actualCandle.close!,
                 entryTime: this.actualCandle.closeTime,
-                stopLoss: 7,
+                stopLoss: this.stopLoss,
+                takeProfit: this.takeProfit,
                 initialFounds: this.founds[0],
             }))
 
@@ -121,7 +122,7 @@ class Strategy {
         if (!closeShortSignalStates.includes(false) && this.openPositions.short.length) {
             //Cierro las posiciones
             this.openPositions.short.forEach(pos => { if (pos.open) this.logger.addResult(pos!.close(this.actualCandle.close!, this.actualCandle.closeTime!, this.founds, ClosePositionReason.Signal)) })
-            //Borro las posiciones cerradas del array
+            //Borro las iposiciones cerradas del array
             this.openPositions.short = this.openPositions.short.filter(pos => pos.open)
         }
         //Si todas las señales Long están en true y no hay posiciones abiertas en Long
@@ -136,7 +137,8 @@ class Strategy {
                 direction: TradingDirections.Long,
                 entryPrice: this.actualCandle.close!,
                 entryTime: this.actualCandle.closeTime,
-                stopLoss: 7,
+                stopLoss: this.stopLoss,
+                takeProfit: this.takeProfit,
                 initialFounds: this.founds[0],
             }))
             //Resta el margin a los fondos totales
