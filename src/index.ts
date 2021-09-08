@@ -78,8 +78,8 @@ app.post('/test', (req, res) => {
     const startSimulation = () => {
         let slowEma = new MovingAvarage({
             id: 0,
-            tag: 'slow 100',
-            period: 100,
+            tag: 'slow 18',
+            period: 18,
             type: MovingAvaragesTypes.Exponential,
             source: 'close',
             timeFrame: TimeFrame['1h'],
@@ -88,8 +88,8 @@ app.post('/test', (req, res) => {
 
         let mediumEma = new MovingAvarage({
             id: 1,
-            tag: 'medium 55',
-            period: 55,
+            tag: 'medium 9',
+            period: 9,
             type: MovingAvaragesTypes.Exponential,
             source: 'close',
             timeFrame: TimeFrame['1h'],
@@ -98,8 +98,8 @@ app.post('/test', (req, res) => {
 
         let fastEma = new MovingAvarage({
             id: 2,
-            tag: 'fast 20',
-            period: 20,
+            tag: 'fast 4',
+            period: 4,
             type: MovingAvaragesTypes.Exponential,
             source: 'close',
             timeFrame: TimeFrame['1h'],

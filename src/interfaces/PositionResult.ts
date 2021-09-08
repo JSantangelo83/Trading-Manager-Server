@@ -13,6 +13,8 @@ export default interface PositionResult extends PositionConfig {
     finalFounds: number,
     /** Close time of the Trade (miliseconds) */
     closeTime: number,
+    /** Close Price of the Trade (miliseconds) */
+     closePrice: number,
     /** The profit/loss percentage */
     percentage: number,
     /** Reason why the position was closed */

@@ -39,6 +39,7 @@ class Position {
         if (this.direction == TradingDirections.Long) { ret.percentage = Helpers.formatFloat(((closePrice * 100) / this.entryPrice) - 100) }
         ret.closeTime = closeTime
         ret.entryTime = this.entryTime
+        ret.closePrice = closePrice
         ret.duration = Helpers.formatFloat(((ret.closeTime - this.entryTime!) / 3600000))
         ret.result = ret.percentage > 0
         ret.profit = Helpers.formatFloat(((ret.percentage * this.margin * (this.leverage || 1)) / 100))
@@ -49,7 +50,7 @@ class Position {
         ret.reason = reason
         ret.direction = this.direction
 
-        return ret
+        return { ...this, ...ret }
     }
 
     getCrossedLimitPrice(priceLow: number = 0, priceHigh: number = 0): [number, ClosePositionReason] {
