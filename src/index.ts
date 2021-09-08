@@ -33,11 +33,19 @@ app.post('/test', (req, res) => {
     let symbol = req.body.symbol
     let interval = req.body.interval
     let nKlines = Number(req.body.nKlines || 0)
+    let startCandle = Number(req.body.startCandle || 0)
     //Error Handling
     if (!symbol || !interval || !nKlines) res.status(403).send('Must indicate Symbol, Interval and nKlines')
     let klines: Candle[]
     axios.get(`${apiUrl}?symbol=${symbol}&interval=${interval}&limit=${(nKlines < 1000 ? nKlines : 1000)}`).then(res => {
-        if (nKlines <= 1000) { klines = Helpers.parseBinanceKLines(res.data) }
+        if (nKlines <= 1000) {
+            klines = Helpers.parseBinanceKLines(res.data)
+
+            let fs = require('fs');
+            fs.writeFileSync(__dirname + '/../Testing/testingCandles.json', JSON.stringify(klines));
+
+            startSimulation();
+        }
         else {
             let lastData = res.data
             let frstTime = res.data[0][6]
@@ -70,8 +78,8 @@ app.post('/test', (req, res) => {
     const startSimulation = () => {
         let slowEma = new MovingAvarage({
             id: 0,
-            tag: 'slow',
-            period: 18,
+            tag: 'slow 100',
+            period: 100,
             type: MovingAvaragesTypes.Exponential,
             source: 'close',
             timeFrame: TimeFrame['1h'],
@@ -80,8 +88,8 @@ app.post('/test', (req, res) => {
 
         let mediumEma = new MovingAvarage({
             id: 1,
-            tag: 'medium',
-            period: 9,
+            tag: 'medium 55',
+            period: 55,
             type: MovingAvaragesTypes.Exponential,
             source: 'close',
             timeFrame: TimeFrame['1h'],
@@ -90,8 +98,8 @@ app.post('/test', (req, res) => {
 
         let fastEma = new MovingAvarage({
             id: 2,
-            tag: 'fast',
-            period: 4,
+            tag: 'fast 20',
+            period: 20,
             type: MovingAvaragesTypes.Exponential,
             source: 'close',
             timeFrame: TimeFrame['1h'],
@@ -221,6 +229,12 @@ app.post('/test', (req, res) => {
 
         let fs = require('fs');
         let candles: Candle[] = JSON.parse(fs.readFileSync(__dirname + '/../Testing/testingCandles.json'));
+
+        let startTime = 0
+        candles.forEach((candle: Candle, i: number) => { if (i == startCandle) startTime = Number(candle.closeTime) })
+
+        if (!startTime) res.send('Debe indicar una vela de inicio para la simulación').status(400)
+
         var tripleEmaStrategy = new Strategy({
             signals: [longSignal1, longSignal2, longSignalADX, closeLongSignal1, closeLongSignal2, shortSignal1, shortSignal2, shortSignalADX, closeShortSignal1, closeShortSignal2],
             timeFrame: TimeFrame['1h'],
@@ -231,7 +245,7 @@ app.post('/test', (req, res) => {
                 timeFrame: TimeFrame['1h'],
                 candles: candles
             }],
-            startTime: 1600815599999,
+            startTime: startTime,
             stopLoss: 8,
             takeProfit: 18,
             logger: logger,
