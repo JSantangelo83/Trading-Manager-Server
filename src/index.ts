@@ -16,7 +16,7 @@ import Logger from './entities/Logger';
 
 const app = express();
 const errorHandler = require('errorhandler')
-const PORT = 3000;
+const PORT = 3001;
 
 app.use(express.json())
 app.use(express.urlencoded())
