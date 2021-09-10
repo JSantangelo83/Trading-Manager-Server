@@ -254,6 +254,7 @@ app.post('/test', (req, res) => {
 
         tripleEmaStrategy.initializeStrategy().then(msg => {
             res.send({
+                simulationStartTime: startTime,
                 indicators: tripleEmaStrategy.indicators.map(indicator => Object({
                     chart: indicator.chart,
                     tag: indicator.tag,
