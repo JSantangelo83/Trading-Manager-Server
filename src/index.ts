@@ -251,15 +251,16 @@ app.post('/test', (req, res) => {
             logger: logger,
             minimumSize: 2,
         })
-
         tripleEmaStrategy.initializeStrategy().then(msg => {
             res.send({
                 simulationStartTime: startTime,
+                timeStep: TimeFrame['1h'],
                 indicators: tripleEmaStrategy.indicators.map(indicator => Object({
                     chart: indicator.chart,
                     tag: indicator.tag,
-                    values: indicator.valueArray.slice(100),
+                    values: indicator.valueArray,
                 })),
+                price: candles,
                 results: logger.results
             })
         }).catch(err => {
