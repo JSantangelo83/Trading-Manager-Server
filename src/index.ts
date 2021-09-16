@@ -256,7 +256,7 @@ app.post('/test', (req, res) => {
         })
         tripleEmaStrategy.initializeStrategy().then(msg => {
             res.send({
-                simulationStartTime: startTime,
+                simulationStartTime: candles[0].closeTime,
                 timeStep: TimeFrame[interval],
                 indicators: tripleEmaStrategy.indicators.map(indicator => Object({
                     chart: indicator.chart,
