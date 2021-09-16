@@ -29,10 +29,10 @@ app.get('/', (req, res) => {
 app.post('/test', (req, res) => {
     let apiUrl = 'https://api1.binance.com/api/v3/klines'
 
-    let symbol = req.body.symbol
-    let interval = req.body.interval
-    let nKlines = Number(req.body.nKlines || 0)
-    let startCandle = Number(req.body.startCandle || 0)
+    let symbol: string = req.body.symbol
+    let interval: keyof typeof TimeFrame = req.body.interval
+    let nKlines: number = Number(req.body.nKlines || 0)
+    let startCandle: number = Number(req.body.startCandle || 0)
     //Error Handling
     if (!symbol || !interval || !nKlines) res.status(403).send('Must indicate Symbol, Interval and nKlines')
     let klines: Candle[]
@@ -81,7 +81,7 @@ app.post('/test', (req, res) => {
             period: 18,
             type: MovingAvaragesTypes.Exponential,
             source: 'close',
-            timeFrame: TimeFrame['1h'],
+            timeFrame: TimeFrame[interval],
             chart: 0,
         })
 
@@ -91,7 +91,7 @@ app.post('/test', (req, res) => {
             period: 9,
             type: MovingAvaragesTypes.Exponential,
             source: 'close',
-            timeFrame: TimeFrame['1h'],
+            timeFrame: TimeFrame[interval],
             chart: 0,
         })
 
@@ -101,14 +101,14 @@ app.post('/test', (req, res) => {
             period: 4,
             type: MovingAvaragesTypes.Exponential,
             source: 'close',
-            timeFrame: TimeFrame['1h'],
+            timeFrame: TimeFrame[interval],
             chart: 0,
         })
 
         let RSI = new RelativeStrengthIndex({
             id: 3,
             tag: 'RSI',
-            timeFrame: TimeFrame['1h'],
+            timeFrame: TimeFrame[interval],
             chart: 1,
         })
 
@@ -117,6 +117,7 @@ app.post('/test', (req, res) => {
 
             id: 4,
             tag: 'RSIUPBand',
+            timeFrame: TimeFrame[interval],
             position: 65,
             chart: 1
         })
@@ -125,6 +126,7 @@ app.post('/test', (req, res) => {
 
             id: 5,
             tag: 'RSILowBand',
+            timeFrame: TimeFrame[interval],
             position: 35,
             chart: 1
         })
@@ -132,19 +134,21 @@ app.post('/test', (req, res) => {
         let ADX = new AvarageDirectionalIndex({
             id: 6,
             tag: 'ADX',
-            timeFrame: TimeFrame['1h'],
+            timeFrame: TimeFrame[interval],
             chart: 1
         })
 
         let adxLine = new Line({
             id: 7,
             tag: 'ADX Open Line',
+            timeFrame: TimeFrame[interval],
             position: 35,
             chart: 1
         })
         let adxCloseLine = new Line({
             id: 8,
             tag: 'ADX Close Line',
+            timeFrame: TimeFrame[interval],
             position: 30,
             chart: 1
         })
@@ -236,12 +240,12 @@ app.post('/test', (req, res) => {
 
         var tripleEmaStrategy = new Strategy({
             signals: [longSignal1, longSignal2, longSignalADX, closeLongSignal1, closeLongSignal2, shortSignal1, shortSignal2, shortSignalADX, closeShortSignal1, closeShortSignal2],
-            timeFrame: TimeFrame['1h'],
+            timeFrame: TimeFrame[interval],
             founds: [100],
             risk: 0.5,
             leverage: 5,
             timedCandles: [{
-                timeFrame: TimeFrame['1h'],
+                timeFrame: TimeFrame[interval],
                 candles: candles
             }],
             startTime: startTime,
@@ -253,7 +257,7 @@ app.post('/test', (req, res) => {
         tripleEmaStrategy.initializeStrategy().then(msg => {
             res.send({
                 simulationStartTime: startTime,
-                timeStep: TimeFrame['1h'],
+                timeStep: TimeFrame[interval],
                 indicators: tripleEmaStrategy.indicators.map(indicator => Object({
                     chart: indicator.chart,
                     tag: indicator.tag,
