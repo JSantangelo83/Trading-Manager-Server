@@ -27,7 +27,6 @@ app.get('/', (req, res) => {
 })
 
 app.post('/test', (req, res) => {
-
     let apiUrl = 'https://api1.binance.com/api/v3/klines'
 
     let symbol = req.body.symbol
@@ -78,7 +77,7 @@ app.post('/test', (req, res) => {
     const startSimulation = () => {
         let slowEma = new MovingAvarage({
             id: 0,
-            tag: 'slow 18',
+            tag: 'Slow 18',
             period: 18,
             type: MovingAvaragesTypes.Exponential,
             source: 'close',
@@ -88,7 +87,7 @@ app.post('/test', (req, res) => {
 
         let mediumEma = new MovingAvarage({
             id: 1,
-            tag: 'medium 9',
+            tag: 'Medium 9',
             period: 9,
             type: MovingAvaragesTypes.Exponential,
             source: 'close',
@@ -98,7 +97,7 @@ app.post('/test', (req, res) => {
 
         let fastEma = new MovingAvarage({
             id: 2,
-            tag: 'fast 4',
+            tag: 'Fast 4',
             period: 4,
             type: MovingAvaragesTypes.Exponential,
             source: 'close',
