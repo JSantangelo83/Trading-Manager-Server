@@ -25,7 +25,6 @@ export default class Logger {
     //This function NEEDS to be improved
     logFinalResult(burned: boolean) {
         if (burned) {
-            // console.log('---------------------------Your account was burned, end of game :c ---------------------------')
             this.log.push('---------------------------Your account was burned, end of game :c ---------------------------')
         }
         //Calculating
@@ -37,19 +36,8 @@ export default class Logger {
         let avarageWin = Helpers.formatFloat(this.results.map(res => res.profit).filter(profit => profit > 0).reduce((p, c) => p + c, 0) / this.results.map(res => res.profit).filter(profit => profit > 0).length)
         let avarageLoss = Helpers.formatFloat(this.results.map(res => res.profit).filter(profit => profit < 0).reduce((p, c) => p + c, 0) / this.results.map(res => res.profit).filter(profit => profit > 0).length)
         let finalSize = Helpers.formatFloat(this.results[this.results.length - 1].finalFounds)
-        //Logging
-        // console.log('')
-        // console.log('--------------------------- Results ---------------------------')
-        // console.log(`${openedPositions} positions were opened`)
-        // console.log(`The account size currently is: ${finalSize}`)
-        // console.log(`The bigger size account was: ${Helpers.formatFloat(bestSize)}`)
-        // console.log(`Wins: ${wins}`)
-        // console.log(`Avarage Win: $${avarageWin}`)
-        // console.log(`Losses: ${losses}`)
-        // console.log(`Avarage Loss: -$${Math.abs(avarageLoss)}`)
-        // console.log(`Accurate: ${Helpers.formatFloat(accurate)}%`)
-        // console.log('---------------------------------------------------------------------')
 
+        //Logging
         this.log.push('')
         this.log.push('--------------------------- Results ---------------------------')
         this.log.push(`${openedPositions} positions were opened`)
@@ -63,10 +51,9 @@ export default class Logger {
         this.log.push('---------------------------------------------------------------------')
 
         // if(this.saveLog){             This. not working in this class
-        if (false) {
+        if (true) {
             let fs = require('fs');
             fs.writeFileSync(__dirname + '/../../Testing/Log' + Date.now() + '.json', JSON.stringify(this.log))
         }
-
     }
 }

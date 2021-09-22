@@ -56,6 +56,7 @@ class Strategy {
                         if (this.founds[0] < this.minimumSize) {
                             this.saveIndicators()
                             this.logger.logFinalResult(true);
+                            resolve('Simulación Finalizada')
                         }
                         this.actualCandle = candle;
                         this.updateIndicators();
@@ -138,7 +139,7 @@ class Strategy {
                 entryPrice: this.actualCandle.close!,
                 entryTime: this.actualCandle.closeTime,
                 stopLoss: this.stopLoss,
-                takeProfit: this.takeProfit,
+                takeProfit: this.takeProfit, 
                 initialFounds: this.founds[0],
             }))
             //Resta el margin a los fondos totales

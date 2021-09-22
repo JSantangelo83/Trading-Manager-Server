@@ -27,6 +27,7 @@ app.get('/', (req, res) => {
 })
 
 app.post('/test', (req, res) => {
+    console.log('POST received, calculating...')
     let apiUrl = 'https://api1.binance.com/api/v3/klines'
 
     let symbol: string = req.body.symbol
@@ -114,7 +115,6 @@ app.post('/test', (req, res) => {
 
 
         let rsiUpBand = new Line({
-
             id: 4,
             tag: 'RSIUPBand',
             timeFrame: TimeFrame[interval],
@@ -123,7 +123,6 @@ app.post('/test', (req, res) => {
         })
 
         let rsiLowBand = new Line({
-
             id: 5,
             tag: 'RSILowBand',
             timeFrame: TimeFrame[interval],
@@ -227,7 +226,7 @@ app.post('/test', (req, res) => {
 
         let logger = new Logger({
             path: __dirname + '/../Testing/log' + Date.now(),
-            saveLog: false,
+            saveLog: true,
         })
 
         let fs = require('fs');
@@ -260,6 +259,7 @@ app.post('/test', (req, res) => {
                 timeStep: TimeFrame[interval],
                 indicators: tripleEmaStrategy.indicators.map(indicator => Object({
                     chart: indicator.chart,
+                    period: indicator.period,
                     tag: indicator.tag,
                     values: indicator.valueArray,
                 })),
